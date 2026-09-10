@@ -450,13 +450,21 @@ h1 {
     </div>
 
     <div class="home-tools">
-      <button class="home-tool-btn" onclick="exportQuestions()">
-        📤 匯出題庫
-      </button>
+<button onclick="exportCSV()" class="home-tool-btn">
+  📄 匯出 CSV
+</button>
 
-      <button class="home-tool-btn" onclick="document.getElementById('importFile').click()">
-        📥 匯入題庫
-      </button>
+<button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">
+  📥 匯入 CSV
+</button>
+
+<input
+  type="file"
+  id="csvImportFile"
+  accept=".csv"
+  style="display:none"
+  onchange="importCSV(event)"
+>
 
       <!-- 可選：日後加入完整備份功能時可使用 -->
       <!--
@@ -1268,76 +1276,251 @@ function toggleTag(tag) {
   }
   renderTagFilter();
 }
-// ========== 匯出題庫 ==========
-function exportQuestions() {
+// ========== CSV 工具函式 ==========
+
+// 將文字轉換成安全的 CSV 格式
+function escapeCSV(value) {
+  const text = String(value ?? '');
+
+  // CSV 內含逗號、雙引號或換行時，需要用雙引號包住
+  if (
+    text.includes(',') ||
+    text.includes('"') ||
+    text.includes('\n') ||
+    text.includes('\r')
+  ) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+
+  return text;
+}
+
+// 匯出題庫為 CSV
+function exportCSV() {
   if (questions.length === 0) {
     alert('目前沒有任何題目可以匯出');
     return;
   }
 
-  const dataStr = JSON.stringify(questions, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
+  const headers = ['id', 'question', 'answer', 'tags'];
+
+  const rows = questions.map(q => [
+    q.id,
+    q.question,
+    q.answer,
+    (q.tags || []).join('、')
+  ]);
+
+  const csvContent = [
+    headers,
+    ...rows
+  ]
+    .map(row => row.map(escapeCSV).join(','))
+    .join('\r\n');
+
+  // 加入 UTF-8 BOM，避免 Excel 開啟中文時出現亂碼
+  const blob = new Blob(
+    ['\uFEFF' + csvContent],
+    { type: 'text/csv;charset=utf-8;' }
+  );
+
   const url = URL.createObjectURL(blob);
-  
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `題庫_${new Date().toLocaleDateString()}.json`;
-  a.click();
-  
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `題庫_${getDateString()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
   URL.revokeObjectURL(url);
-  alert('題庫已匯出！');
+
+  alert('CSV 題庫已匯出！');
 }
 
+function getDateString() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+
+// 解析 CSV，支援逗號、雙引號及換行
+function parseCSV(csvText) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < csvText.length; i++) {
+    const char = csvText[i];
+    const nextChar = csvText[i + 1];
+
+    if (char === '"' && insideQuotes && nextChar === '"') {
+      // CSV 中的 "" 代表一個雙引號
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === ',' && !insideQuotes) {
+      row.push(cell);
+      cell = '';
+    } else if (
+      (char === '\n' || char === '\r') &&
+      !insideQuotes
+    ) {
+      // 處理 Windows 的 \r\n
+      if (char === '\r' && nextChar === '\n') {
+        i++;
+      }
+
+      row.push(cell);
+      cell = '';
+
+      // 避免檔案最後多出空白列
+      if (row.some(value => value.trim() !== '')) {
+        rows.push(row);
+      }
+
+      row = [];
+    } else {
+      cell += char;
+    }
+  }
+
+  // 處理最後一格
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell);
+
+    if (row.some(value => value.trim() !== '')) {
+      rows.push(row);
+    }
+  }
+
+  return rows;
+}
+
+
 // ========== 匯入題庫 ==========
-function importQuestions(event) {
+function importCSV(event) {
   const file = event.target.files[0];
+
   if (!file) return;
 
   const reader = new FileReader();
+
   reader.onload = function(e) {
     try {
-      const imported = JSON.parse(e.target.result);
-      
-      if (!Array.isArray(imported)) {
-        alert('檔案格式不正確');
+      let csvText = e.target.result;
+
+      // 移除 UTF-8 BOM
+      csvText = csvText.replace(/^\uFEFF/, '');
+
+      const rows = parseCSV(csvText);
+
+      if (rows.length < 2) {
+        alert('CSV 檔案沒有有效題目資料');
         return;
       }
 
-      // 詢問要用哪種方式匯入
-      const mode = confirm(
-        `共讀取到 ${imported.length} 題\n\n` +
-        `按「確定」= 合併到現有題庫\n` +
-        `按「取消」= 完全覆蓋現有題庫`
+      const headers = rows[0].map(header =>
+        header.trim().toLowerCase()
       );
 
-      if (mode) {
-        // 合併（避免 id 重複）
+      const questionIndex = headers.indexOf('question');
+      const answerIndex = headers.indexOf('answer');
+      const tagsIndex = headers.indexOf('tags');
+      const idIndex = headers.indexOf('id');
+
+      if (questionIndex === -1 || answerIndex === -1) {
+        alert('CSV 格式錯誤：必須包含 question 和 answer 欄位');
+        return;
+      }
+
+      const importedQuestions = rows
+        .slice(1)
+        .map(row => {
+          const question = (row[questionIndex] || '').trim();
+          const answer = (row[answerIndex] || '').trim();
+          const tagsText = (row[tagsIndex] || '').trim();
+
+          if (!question || !answer) {
+            return null;
+          }
+
+          const tags = tagsText
+            ? tagsText
+                .split(/[、,]/)
+                .map(tag => tag.trim())
+                .filter(Boolean)
+            : [];
+
+          return {
+            id: idIndex !== -1 && row[idIndex]
+              ? Number(row[idIndex])
+              : Date.now() + Math.random(),
+
+            question,
+            answer,
+            tags: [...new Set(tags)]
+          };
+        })
+        .filter(Boolean);
+
+      if (importedQuestions.length === 0) {
+        alert('CSV 中沒有有效的題目');
+        return;
+      }
+
+      const shouldMerge = confirm(
+        `成功讀取 ${importedQuestions.length} 題。\n\n` +
+        `按「確定」合併到現有題庫。\n` +
+        `按「取消」覆蓋現有題庫。`
+      );
+
+      if (shouldMerge) {
         const existingIds = new Set(questions.map(q => q.id));
-        const newOnes = imported.filter(q => !existingIds.has(q.id));
-        questions = questions.concat(newOnes);
-        alert(`成功合併 ${newOnes.length} 題！`);
+
+        const newQuestions = importedQuestions.filter(q =>
+          !existingIds.has(q.id)
+        );
+
+        questions = questions.concat(newQuestions);
+
+        alert(`成功合併 ${newQuestions.length} 題！`);
       } else {
-        // 覆蓋
-        questions = imported;
+        questions = importedQuestions;
         alert(`已覆蓋為 ${questions.length} 題！`);
       }
 
       saveQuestions();
-      
-      // 如果正在寫問題模式，重新渲染列表
-      if (document.getElementById('write').classList.contains('active')) {
+
+      // 更新畫面
+      if (document.getElementById('write')?.classList.contains('active')) {
         renderQuestionList();
+        renderExistingTagSuggestions();
       }
-      
-    } catch (err) {
-      alert('讀取檔案失敗，請確認是正確的 JSON 檔');
+
+      if (typeof renderTagFilter === 'function') {
+        renderTagFilter();
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert('CSV 讀取失敗，請確認檔案格式正確');
     }
   };
-  reader.readAsText(file);
-  
-  // 清空 input，讓同一個檔案可以重複選擇
+
+  // 繁體中文 CSV 通常使用 UTF-8
+  reader.readAsText(file, 'UTF-8');
+
+  // 清空 input，讓同一個檔案可以再次選取
   event.target.value = '';
 }
+
 function openTagManager() {
   document.getElementById('tagManagerModal').style.display = 'flex';
   renderTagManager();
