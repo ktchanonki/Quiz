@@ -143,6 +143,7 @@ textarea:focus, input[type="text"]:focus {
   background: white;
   border-radius: 18px;
   padding: 16px;
+  padding-right: 96px; /* 預留空間俾右上角編輯／刪除掣 */
   margin-bottom: 12px;
   box-shadow: 0 4px 12px rgba(155, 135, 200, 0.1);
   position: relative;
@@ -736,15 +737,11 @@ body::after {
   <!-- 階段二：進行中的問答 -->
   <div id="quiz-play" style="display: none;">
 <div class="question-card-wrapper">
-  <div id="questionCard" class="question-card">
-    <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
-    
-    <div id="currentAnswer" style="display: none; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 16px; color: #6b5b95;"></div>
-
-    <button id="toggleAnswerBtn" onclick="toggleAnswer()" class="primary-btn">
-      顯示答案
-    </button>
-  </div>
+<div id="questionCard" class="question-card">
+  <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
+  
+  <div id="currentAnswer" style="display: block; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 0; color: #6b5b95;"></div>
+</div>
 </div>
     <!-- 標記誰答對 -->
     <div class="card" style="margin-top: 16px;">
@@ -1417,23 +1414,10 @@ function nextQuestion(isFirst = false) {
 // 更新問題卡內容（抽離出嚟方便動畫用）
 function updateQuestionContent() {
   document.getElementById('currentQuestion').textContent = currentQuestion.question;
-  document.getElementById('currentAnswer').style.display = 'none';
-  document.getElementById('currentAnswer').textContent = '答案：' + currentQuestion.answer;
-  document.getElementById('toggleAnswerBtn').textContent = '顯示答案';
+  const answerEl = document.getElementById('currentAnswer');
+  answerEl.style.display = 'block';
+  answerEl.textContent = '答案：' + currentQuestion.answer;
 }
-
-  function toggleAnswer() {
-    const answerEl = document.getElementById('currentAnswer');
-    const btn = document.getElementById('toggleAnswerBtn');
-    if (answerEl.style.display === 'none') {
-      answerEl.style.display = 'block';
-      btn.textContent = '隱藏答案';
-    } else {
-      answerEl.style.display = 'none';
-      btn.textContent = '顯示答案';
-    }
-  }
-
   function renderCorrectPlayers() {
     const el = document.getElementById('correctPlayers');
     el.innerHTML = players.map(name => {
