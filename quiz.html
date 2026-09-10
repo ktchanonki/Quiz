@@ -501,6 +501,80 @@ textarea,
 select {
   font-size: 16px;
 }
+/* ========== 首頁漸變光暈背景 ========== */
+body {
+  background: linear-gradient(135deg, #e8d5f5 0%, #f3e8ff 45%, #fce7f3 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  width: 420px;
+  height: 420px;
+  background: #c4b5fd;
+  top: -120px;
+  left: -100px;
+}
+
+body::after {
+  width: 380px;
+  height: 380px;
+  background: #f9a8d4;
+  bottom: -100px;
+  right: -80px;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+}
+
+/* ========== 問題卡滑動動畫 ========== */
+.question-card-wrapper {
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+}
+
+.question-card {
+  background: #faf5ff;
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.35s ease;
+  will-change: transform, opacity;
+}
+
+/* 滑出（向左 + 縮小） */
+.question-card.slide-out {
+  transform: translateX(-110%) scale(0.95);
+  opacity: 0;
+}
+
+/* 準備從右邊進來 */
+.question-card.slide-in-start {
+  transform: translateX(110%) scale(0.95);
+  opacity: 0;
+  transition: none;
+}
+
+/* 滑入完成（回正 + 放大到 100%） */
+.question-card.slide-in-end {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+}
 </style>
 </head>
 <body>
@@ -657,16 +731,17 @@ select {
 
   <!-- 階段二：進行中的問答 -->
   <div id="quiz-play" style="display: none;">
-    <div class="card" style="text-align: center;">
-      <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
-      
-      <div id="currentAnswer" style="display: none; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 16px; color: #6b5b95;"></div>
+<div class="question-card-wrapper">
+  <div id="questionCard" class="question-card">
+    <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
+    
+    <div id="currentAnswer" style="display: none; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 16px; color: #6b5b95;"></div>
 
-      <button id="toggleAnswerBtn" onclick="toggleAnswer()" class="primary-btn">
-        顯示答案
-      </button>
-    </div>
-
+    <button id="toggleAnswerBtn" onclick="toggleAnswer()" class="primary-btn">
+      顯示答案
+    </button>
+  </div>
+</div>
     <!-- 標記誰答對 -->
     <div class="card" style="margin-top: 16px;">
       <label>誰答對了？（可多選）</label>
@@ -1197,58 +1272,89 @@ if (filteredQuestions.length === 0) {
     nextQuestion(true);
   }
 
-  function nextQuestion(isFirst = false) {
-    if (!isFirst && currentQuestion) {
-      // 自動記錄本場所有玩家都聽過
-      players.forEach(playerName => {
-        const already = heardRecords.some(r => 
-          r.questionId === currentQuestion.id && r.playerName === playerName
-        );
-        if (!already) {
-          heardRecords.push({
-            questionId: currentQuestion.id,
-            playerName: playerName,
-            heardAt: Date.now()
-          });
-        }
-      });
-      localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
-
-      // 加分
-      currentCorrect.forEach(name => {
-        if (sessionScores[name] !== undefined) {
-          sessionScores[name] += 1;
-        }
-      });
-    }
-
-const baseQuestions = selectedTags.length === 0
-  ? questions
-  : questions.filter(q => q.tags.some(tag => selectedTags.includes(tag)));
-
-const available = baseQuestions.filter(q => {
-      const heardBy = heardRecords
-        .filter(r => r.questionId === q.id)
-        .map(r => r.playerName);
-      return players.every(p => !heardBy.includes(p));
+function nextQuestion(isFirst = false) {
+  if (!isFirst && currentQuestion) {
+    // 自動記錄本場所有玩家都聽過
+    players.forEach(playerName => {
+      const already = heardRecords.some(r => 
+        r.questionId === currentQuestion.id && r.playerName === playerName
+      );
+      if (!already) {
+        heardRecords.push({
+          questionId: currentQuestion.id,
+          playerName: playerName,
+          heardAt: Date.now()
+        });
+      }
     });
+    localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
 
-    if (available.length === 0) {
-      alert('所有玩家都已經聽過目前能出的題目了！');
-      endQuiz();
-      return;
-    }
-
-    currentQuestion = available[Math.floor(Math.random() * available.length)];
-    currentCorrect = [];
-
-    document.getElementById('currentQuestion').textContent = currentQuestion.question;
-    document.getElementById('currentAnswer').style.display = 'none';
-    document.getElementById('currentAnswer').textContent = '答案：' + currentQuestion.answer;
-    document.getElementById('toggleAnswerBtn').textContent = '顯示答案';
-
-    renderCorrectPlayers();
+    // 加分
+    currentCorrect.forEach(name => {
+      if (sessionScores[name] !== undefined) {
+        sessionScores[name] += 1;
+      }
+    });
   }
+
+  const baseQuestions = selectedTags.length === 0
+    ? questions
+    : questions.filter(q => q.tags.some(tag => selectedTags.includes(tag)));
+
+  const available = baseQuestions.filter(q => {
+    const heardBy = heardRecords
+      .filter(r => r.questionId === q.id)
+      .map(r => r.playerName);
+    return players.every(p => !heardBy.includes(p));
+  });
+
+  if (available.length === 0) {
+    alert('所有玩家都已經聽過目前能出的題目了！');
+    endQuiz();
+    return;
+  }
+
+  const newQuestion = available[Math.floor(Math.random() * available.length)];
+  const card = document.getElementById('questionCard');
+
+  // 第一題：直接顯示，唔使動畫
+  if (isFirst) {
+    currentQuestion = newQuestion;
+    currentCorrect = [];
+    updateQuestionContent();
+    renderCorrectPlayers();
+    return;
+  }
+
+  // 之後每題：先向左滑出
+  card.classList.remove('slide-in-start', 'slide-in-end');
+  card.classList.add('slide-out');
+
+  // 等滑出動畫完成後再換內容 + 由右滑入
+  setTimeout(() => {
+    currentQuestion = newQuestion;
+    currentCorrect = [];
+    updateQuestionContent();
+    renderCorrectPlayers();
+
+    // 瞬間移到右邊準備入場
+    card.classList.remove('slide-out');
+    card.classList.add('slide-in-start');
+
+    // 強制 reflow，然後觸發滑入
+    void card.offsetWidth;
+    card.classList.remove('slide-in-start');
+    card.classList.add('slide-in-end');
+  }, 350);
+}
+
+// 更新問題卡內容（抽離出嚟方便動畫用）
+function updateQuestionContent() {
+  document.getElementById('currentQuestion').textContent = currentQuestion.question;
+  document.getElementById('currentAnswer').style.display = 'none';
+  document.getElementById('currentAnswer').textContent = '答案：' + currentQuestion.answer;
+  document.getElementById('toggleAnswerBtn').textContent = '顯示答案';
+}
 
   function toggleAnswer() {
     const answerEl = document.getElementById('currentAnswer');
