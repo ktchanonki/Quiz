@@ -1219,17 +1219,37 @@ function addSavedPlayer(index) {
   renderPlayerList();
 }
 
-// 刪除已儲存玩家
+// 刪除已儲存玩家（同時清除呢個名嘅聽過紀錄）
 function deleteSavedPlayer(index) {
   const name = savedPlayers[index];
 
-  if (!confirm(`確定要刪除已儲存玩家「${name}」嗎？`)) {
-    return;
-  }
+  if (!name) return;
 
+  const confirmed = confirm(
+    `確定要刪除已儲存玩家「${name}」嗎？\n\n` +
+    `刪除後，呢個名嘅所有「聽過紀錄」都會一併清除。`
+  );
+
+  if (!confirmed) return;
+
+  // 1. 從已儲存玩家名單移除
   savedPlayers.splice(index, 1);
   savePlayers();
+
+  // 2. 同時清除呢個玩家名嘅所有聽過紀錄
+  const beforeCount = heardRecords.length;
+  heardRecords = heardRecords.filter(r => r.playerName !== name);
+  localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
+
+  const removedCount = beforeCount - heardRecords.length;
+
   renderSavedPlayers();
+
+  if (removedCount > 0) {
+    alert(`已刪除玩家「${name}」，並清除咗 ${removedCount} 筆聽過紀錄。`);
+  } else {
+    alert(`已刪除玩家「${name}」。`);
+  }
 }
 
   // ========== 問問題模式 ==========
