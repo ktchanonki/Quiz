@@ -299,7 +299,7 @@ h1 {
 
 .home-tools {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -609,22 +609,26 @@ body::after {
       題庫工具
     </div>
 
-    <div class="home-tools">
-<button onclick="exportCSV()" class="home-tool-btn">
-  📄 匯出 CSV
-</button>
+<div class="home-tools">
+  <button onclick="exportCSV()" class="home-tool-btn">
+    📄 匯出 CSV
+  </button>
 
-<button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">
-  📥 匯入 CSV
-</button>
+  <button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">
+    📥 匯入 CSV
+  </button>
 
-<input
-  type="file"
-  id="csvImportFile"
-  accept=".csv"
-  style="display:none"
-  onchange="importCSV(event)"
->
+  <button onclick="openPasteCSV()" class="home-tool-btn">
+    📋 貼上 CSV
+  </button>
+
+  <input
+    type="file"
+    id="csvImportFile"
+    accept=".csv"
+    style="display:none"
+    onchange="importCSV(event)"
+  >
 
       <!-- 可選：日後加入完整備份功能時可使用 -->
       <!--
@@ -824,6 +828,48 @@ body::after {
     </p>
 
     <div id="tagManagerList"></div>
+  </div>
+</div>
+
+<!-- 貼上 CSV 文字匯入 -->
+<div id="pasteCSVModal"
+     style="display:none; position:fixed; inset:0; z-index:100;
+            background:rgba(74,63,107,0.45); padding:20px;
+            align-items:center; justify-content:center;">
+
+  <div style="background:white; width:min(520px, 100%); max-height:90vh;
+              overflow-y:auto; border-radius:24px; padding:24px;
+              box-shadow:0 10px 40px rgba(74,63,107,0.3);">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+      <h2 style="margin:0;">📋 貼上 CSV 文字</h2>
+      <button onclick="closePasteCSV()"
+              style="width:36px; height:36px; padding:0; margin:0;
+                     background:#f3e8ff; color:#7c3aed;">
+        ✕
+      </button>
+    </div>
+
+    <p style="font-size:14px; color:#7c6b9b; margin-bottom:14px; line-height:1.5;">
+      直接將 CSV 內容貼上呢度（包含標題列）。<br>
+      支援問題／答案入面有換行（只要有用雙引號包住）。
+    </p>
+
+    <textarea id="pasteCSVInput"
+              rows="12"
+              placeholder="id,question,answer,tags
+1,太陽系有幾大行星？,八大行星,科學
+2,\"這題有
+換行\",答案,測試"></textarea>
+
+    <div class="btn-row" style="margin-top:18px;">
+      <button onclick="closePasteCSV()" style="background:#f3e8ff; color:#7c3aed;">
+        取消
+      </button>
+      <button class="primary-btn" onclick="importPastedCSV()">
+        開始匯入
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1672,43 +1718,43 @@ function importCSV(event) {
         })
         .filter(Boolean);
 
-      if (importedQuestions.length === 0) {
-        alert('CSV 中沒有有效的題目');
-        return;
-      }
+// 成功讀取後
+if (importedQuestions.length === 0) {
+  alert('CSV 中沒有有效的題目');
+  return;
+}
 
-      const shouldMerge = confirm(
-        `成功讀取 ${importedQuestions.length} 題。\n\n` +
-        `按「確定」合併到現有題庫。\n` +
-        `按「取消」覆蓋現有題庫。`
-      );
+// 確定 = 合併；取消 = 取消匯入
+const shouldImport = confirm(
+  `成功讀取 ${importedQuestions.length} 題。\n\n` +
+  `按「確定」合併到現有題庫。\n` +
+  `按「取消」取消匯入。`
+);
 
-      if (shouldMerge) {
-        const existingIds = new Set(questions.map(q => q.id));
+if (!shouldImport) {
+  return; // 取消就什麼都不做
+}
 
-        const newQuestions = importedQuestions.filter(q =>
-          !existingIds.has(q.id)
-        );
+// 只做合併
+const existingIds = new Set(questions.map(q => q.id));
+const newQuestions = importedQuestions.filter(q =>
+  !existingIds.has(q.id)
+);
 
-        questions = questions.concat(newQuestions);
+questions = questions.concat(newQuestions);
+alert(`成功合併 ${newQuestions.length} 題！`);
 
-        alert(`成功合併 ${newQuestions.length} 題！`);
-      } else {
-        questions = importedQuestions;
-        alert(`已覆蓋為 ${questions.length} 題！`);
-      }
+saveQuestions();
 
-      saveQuestions();
+// 更新畫面
+if (document.getElementById('write')?.classList.contains('active')) {
+  renderQuestionList();
+  renderExistingTagSuggestions();
+}
 
-      // 更新畫面
-      if (document.getElementById('write')?.classList.contains('active')) {
-        renderQuestionList();
-        renderExistingTagSuggestions();
-      }
-
-      if (typeof renderTagFilter === 'function') {
-        renderTagFilter();
-      }
+if (typeof renderTagFilter === 'function') {
+  renderTagFilter();
+}
 
     } catch (error) {
       console.error(error);
@@ -1879,7 +1925,110 @@ function deleteTag(index) {
 
   alert(`Tag「${tagToDelete}」已從所有題目中移除。`);
 }
+// ========== 貼上 CSV 文字匯入 ==========
+function openPasteCSV() {
+  document.getElementById('pasteCSVInput').value = '';
+  document.getElementById('pasteCSVModal').style.display = 'flex';
+}
 
+function closePasteCSV() {
+  document.getElementById('pasteCSVModal').style.display = 'none';
+}
+
+function importPastedCSV() {
+  let csvText = document.getElementById('pasteCSVInput').value.trim();
+
+  if (!csvText) {
+    alert('請先貼上 CSV 內容');
+    return;
+  }
+
+  // 移除可能出現的 BOM
+  csvText = csvText.replace(/^\uFEFF/, '');
+
+  try {
+    const rows = parseCSV(csvText);
+
+    if (rows.length < 2) {
+      alert('CSV 內容沒有有效題目資料');
+      return;
+    }
+
+    const headers = rows[0].map(header => header.trim().toLowerCase());
+
+    const questionIndex = headers.indexOf('question');
+    const answerIndex = headers.indexOf('answer');
+    const tagsIndex = headers.indexOf('tags');
+    const idIndex = headers.indexOf('id');
+
+    if (questionIndex === -1 || answerIndex === -1) {
+      alert('CSV 格式錯誤：必須包含 question 和 answer 欄位');
+      return;
+    }
+
+    const importedQuestions = rows
+      .slice(1)
+      .map(row => {
+        const question = (row[questionIndex] || '').trim();
+        const answer = (row[answerIndex] || '').trim();
+        const tagsText = (row[tagsIndex] || '').trim();
+
+        if (!question || !answer) return null;
+
+        const tags = tagsText
+          ? tagsText.split(/[、,，]/).map(tag => tag.trim()).filter(Boolean)
+          : [];
+
+        return {
+          id: idIndex !== -1 && row[idIndex]
+            ? Number(row[idIndex])
+            : Date.now() + Math.random(),
+          question,
+          answer,
+          tags: [...new Set(tags)]
+        };
+      })
+      .filter(Boolean);
+
+    if (importedQuestions.length === 0) {
+      alert('沒有讀取到有效的題目');
+      return;
+    }
+
+    // 確定 = 合併；取消 = 取消匯入（什麼都不做）
+    const shouldImport = confirm(
+      `成功讀取 ${importedQuestions.length} 題。\n\n` +
+      `按「確定」合併到現有題庫。\n` +
+      `按「取消」取消匯入。`
+    );
+
+    if (!shouldImport) {
+      return; // 取消就直接離開
+    }
+
+    // 只做合併
+    const existingIds = new Set(questions.map(q => q.id));
+    const newQuestions = importedQuestions.filter(q => !existingIds.has(q.id));
+    questions = questions.concat(newQuestions);
+    alert(`成功合併 ${newQuestions.length} 題！`);
+
+    saveQuestions();
+    closePasteCSV();
+
+    // 更新畫面
+    if (document.getElementById('write')?.classList.contains('active')) {
+      renderQuestionList();
+      renderExistingTagSuggestions();
+    }
+    if (typeof renderTagFilter === 'function') {
+      renderTagFilter();
+    }
+
+  } catch (error) {
+    console.error(error);
+    alert('CSV 解析失敗，請確認格式正確');
+  }
+}
 </script>
 </body>
 </html>
