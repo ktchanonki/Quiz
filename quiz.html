@@ -2,7 +2,8 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>🏆競技問答</title>
 <style>
   * {
@@ -117,12 +118,16 @@ label:first-child {
   margin-top: 0;
 }
 
-textarea, input[type="text"] {
+textarea,
+input[type="text"],
+input[type="search"],
+input[type="number"] {
   width: 100%;
   padding: 12px 14px;
   border: 2px solid #e9d5ff;
   border-radius: 14px;
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.4;
   background: white;
   color: #4a3f6b;
   resize: vertical;
@@ -554,6 +559,19 @@ select {
   }
 }
 
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+/* 防止手機輸入時自動放大畫面 */
+textarea,
+input[type="text"],
+input[type="search"],
+input[type="number"],
+select {
+  font-size: 16px !important;
+}
 </style>
 </head>
 <body>
