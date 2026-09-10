@@ -455,19 +455,24 @@ select {
 }
 
 /* Modal 開啟時，背景不可跟著滑動 */
-#editQuestionModal,
-#tagManagerModal {
+#editQuestionModal {
   overscroll-behavior: none;
   touch-action: none;
 }
 
-#editQuestionModal > div,
-#tagManagerModal > div {
+#editQuestionModal > div {
   max-height: 90dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
+}
+
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 /* 手機直向 */
@@ -1043,11 +1048,13 @@ function openEditQuestionModal(id) {
 
   const modal = document.getElementById('editQuestionModal');
   modal.style.display = 'flex';
+  document.body.classList.add('modal-open');
 }
 
 function closeEditQuestionModal() {
   editingQuestionId = null;
   document.getElementById('editQuestionModal').style.display = 'none';
+  document.body.classList.remove('modal-open');
 }
 
 function saveEditedQuestion() {
