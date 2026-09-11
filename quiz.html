@@ -594,11 +594,11 @@ body::after {
   <section class="home-panel">
 
     <div class="home-main-actions">
-      <button class="home-action-card write-card" onclick="showMode('write')">
-        <span class="home-action-icon">✏️</span>
-        <span class="home-action-title">建立題庫</span>
+      <button class="home-action-card write-card" onclick="showMode('manage')">
+        <span class="home-action-icon">📚</span>
+        <span class="home-action-title">管理題庫</span>
         <span class="home-action-desc">
-          新增、編輯、刪除問題<br>及管理分類 Tag
+          搜尋、過濾、編輯<br>整理所有問題
         </span>
       </button>
 
@@ -662,12 +662,47 @@ body::after {
   </section>
 </div>
 
+<!-- 管理題庫模式 -->
+<div id="manage" class="mode">
+  <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
+  
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
+    <h2 style="margin:0;">📚 管理題庫</h2>
+    <button class="primary-btn" onclick="showMode('write')" 
+            style="width:auto; margin:0; padding:10px 18px; font-size:14px;">
+      ＋ 新增問題
+    </button>
+  </div>
+
+  <!-- 搜尋 + Tag 過濾 -->
+  <div class="card">
+    <label>搜尋問題</label>
+    <input type="search"
+           id="writeSearchInput"
+           placeholder="輸入關鍵字搜尋問題或答案..."
+           oninput="onWriteSearchInput()">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px;">
+      <label style="margin:0;">按 Tag 過濾（可多選）</label>
+      <button onclick="openTagManager()"
+              style="width:auto; margin:0; padding:6px 12px; font-size:13px;
+                     background:#f3e8ff; color:#7c3aed; box-shadow:none;">
+        🏷️ 管理 Tag
+      </button>
+    </div>
+    <div id="writeTagFilterList" class="tags" style="margin-top: 8px;"></div>
+  </div>
+
+  <!-- 問題列表 -->
+  <div id="questionCountBar" style="margin-top:16px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
+  <div id="questionList"></div>
+</div>
+
 <!-- 寫問題模式 -->
 <div id="write" class="mode">
-  <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
-  <h2>✏️ 寫問題</h2>
+  <button class="back-btn" onclick="showMode('manage')">← 返回管理題庫</button>
+  <h2>✏️ 新增問題</h2>
 
-  <!-- 新增問題表單 -->
   <div class="card">
     <label>問題</label>
     <textarea id="questionInput" placeholder="請輸入問題..." rows="3"></textarea>
@@ -675,40 +710,22 @@ body::after {
     <label>答案</label>
     <textarea id="answerInput" placeholder="請輸入答案..." rows="2"></textarea>
 
-<label>分類 Tag（用逗號分隔）</label>
-<input type="text" id="tagsInput" placeholder="例如：歷史, 動漫, 科學">
+    <label>分類 Tag（用逗號分隔）</label>
+    <input type="text" id="tagsInput" placeholder="例如：歷史, 動漫, 科學">
 
-<div style="margin-top:10px;">
-  <div style="font-size:13px; color:#7c6b9b; margin-bottom:6px;">
-    現有 Tag（按一下加入）：
-  </div>
-  <div id="existingTagSuggestions" class="tags"></div>
-</div>
+    <div style="margin-top:10px;">
+      <div style="font-size:13px; color:#7c6b9b; margin-bottom:6px;">
+        現有 Tag（按一下加入）：
+      </div>
+      <div id="existingTagSuggestions" class="tags"></div>
+    </div>
 
     <button class="primary-btn" onclick="addQuestion()" style="margin-top: 16px;">
       新增問題
     </button>
   </div>
-<button onclick="openTagManager()" style="background:#f3e8ff; color:#7c3aed;">
-  🏷️ 管理 Tag
-</button>
-
-  <!-- 搜尋 + Tag 過濾 -->
-  <div class="card" style="margin-top: 20px;">
-    <label>搜尋問題</label>
-    <input type="search"
-           id="writeSearchInput"
-           placeholder="輸入關鍵字搜尋問題或答案..."
-           oninput="onWriteSearchInput()">
-
-    <label style="margin-top:14px;">按 Tag 過濾（可多選）</label>
-    <div id="writeTagFilterList" class="tags" style="margin-top: 8px;"></div>
-  </div>
-
-  <!-- 問題列表 -->
-  <div id="questionCountBar" style="margin-top:20px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
-  <div id="questionList"></div>
 </div>
+
 
 <!-- 問問題模式 -->
 <div id="quiz" class="mode">
@@ -913,29 +930,35 @@ let editingQuestionId = null;
 function showMode(mode) {
   document.getElementById('home').style.display = 'none';
   document.getElementById('write').classList.remove('active');
+  document.getElementById('manage').classList.remove('active');
   document.getElementById('quiz').classList.remove('active');
 
   if (mode === 'home') {
     document.getElementById('home').style.display = 'block';
   } else {
     document.getElementById(mode).classList.add('active');
-if (mode === 'write') {
-  renderWriteTagFilter();
-  renderQuestionList();
-  renderExistingTagSuggestions();
-}
-if (mode === 'quiz') {
-  renderTagFilter();
-  renderSavedPlayers();
-  renderPlayerList();
 
-  // 重置畫面狀態
-  document.getElementById('quiz-setup').style.display = 'block';
-  document.getElementById('quiz-play').style.display = 'none';
-  document.getElementById('quiz-result').style.display = 'none';
-}
+    if (mode === 'manage') {
+      renderWriteTagFilter();
+      renderQuestionList();
+    }
+
+    if (mode === 'write') {
+      renderExistingTagSuggestions();
+    }
+
+    if (mode === 'quiz') {
+      renderTagFilter();
+      renderSavedPlayers();
+      renderPlayerList();
+
+      document.getElementById('quiz-setup').style.display = 'block';
+      document.getElementById('quiz-play').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'none';
+    }
   }
 }
+
 // 將 Tag 文字轉換為乾淨、沒有重複的 Tag 陣列
 function normalizeTags(tagsText) {
   if (!tagsText) return [];
@@ -990,14 +1013,13 @@ function addQuestion() {
   document.getElementById('answerInput').value = '';
   document.getElementById('tagsInput').value = '';
 
-  // 收起手機鍵盤
   if (document.activeElement) {
     document.activeElement.blur();
   }
 
-  renderQuestionList();
-  renderWriteTagFilter();
-  renderExistingTagSuggestions();
+  // 新增後返回管理題庫
+  showMode('manage');
+  alert('問題已新增！');
 }
 
 // 寫問題模式：搜尋輸入
