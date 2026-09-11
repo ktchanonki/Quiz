@@ -143,7 +143,6 @@ textarea:focus, input[type="text"]:focus {
   background: white;
   border-radius: 18px;
   padding: 16px;
-  padding-right: 96px; /* 預留空間俾右上角編輯／刪除掣 */
   margin-bottom: 12px;
   box-shadow: 0 4px 12px rgba(155, 135, 200, 0.1);
   position: relative;
@@ -300,7 +299,7 @@ h1 {
 
 .home-tools {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -455,24 +454,19 @@ select {
 }
 
 /* Modal 開啟時，背景不可跟著滑動 */
-#editQuestionModal {
+#editQuestionModal,
+#tagManagerModal {
   overscroll-behavior: none;
   touch-action: none;
 }
 
-#editQuestionModal > div {
+#editQuestionModal > div,
+#tagManagerModal > div {
   max-height: 90dvh;
   overflow-y: auto;
   overscroll-behavior: contain;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
-}
-
-body.modal-open {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
 }
 
 /* 手機直向 */
@@ -507,80 +501,6 @@ textarea,
 select {
   font-size: 16px;
 }
-/* ========== 首頁漸變光暈背景 ========== */
-body {
-  background: linear-gradient(135deg, #e8d5f5 0%, #f3e8ff 45%, #fce7f3 100%);
-  position: relative;
-  overflow-x: hidden;
-}
-
-body::before,
-body::after {
-  content: "";
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.55;
-  pointer-events: none;
-  z-index: 0;
-}
-
-body::before {
-  width: 420px;
-  height: 420px;
-  background: #c4b5fd;
-  top: -120px;
-  left: -100px;
-}
-
-body::after {
-  width: 380px;
-  height: 380px;
-  background: #f9a8d4;
-  bottom: -100px;
-  right: -80px;
-}
-
-.container {
-  position: relative;
-  z-index: 1;
-}
-
-/* ========== 問題卡滑動動畫 ========== */
-.question-card-wrapper {
-  position: relative;
-  overflow: hidden;
-  min-height: 180px;
-}
-
-.question-card {
-  background: #faf5ff;
-  border-radius: 20px;
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.35s ease;
-  will-change: transform, opacity;
-}
-
-/* 滑出（向左 + 縮小） */
-.question-card.slide-out {
-  transform: translateX(-110%) scale(0.95);
-  opacity: 0;
-}
-
-/* 準備從右邊進來 */
-.question-card.slide-in-start {
-  transform: translateX(110%) scale(0.95);
-  opacity: 0;
-  transition: none;
-}
-
-/* 滑入完成（回正 + 放大到 100%） */
-.question-card.slide-in-end {
-  transform: translateX(0) scale(1);
-  opacity: 1;
-}
 </style>
 </head>
 <body>
@@ -594,11 +514,11 @@ body::after {
   <section class="home-panel">
 
     <div class="home-main-actions">
-      <button class="home-action-card write-card" onclick="showMode('manage')">
-        <span class="home-action-icon">📚</span>
-        <span class="home-action-title">管理題庫</span>
+      <button class="home-action-card write-card" onclick="showMode('write')">
+        <span class="home-action-icon">✏️</span>
+        <span class="home-action-title">建立題庫</span>
         <span class="home-action-desc">
-          搜尋、過濾、編輯<br>整理所有問題
+          新增、編輯、刪除問題<br>及管理分類 Tag
         </span>
       </button>
 
@@ -615,26 +535,22 @@ body::after {
       題庫工具
     </div>
 
-<div class="home-tools">
-  <button onclick="exportCSV()" class="home-tool-btn">
-    📄 匯出 CSV
-  </button>
+    <div class="home-tools">
+<button onclick="exportCSV()" class="home-tool-btn">
+  📄 匯出 CSV
+</button>
 
-  <button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">
-    📥 匯入 CSV
-  </button>
+<button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">
+  📥 匯入 CSV
+</button>
 
-  <button onclick="openPasteCSV()" class="home-tool-btn">
-    📋 貼上 CSV
-  </button>
-
-  <input
-    type="file"
-    id="csvImportFile"
-    accept=".csv"
-    style="display:none"
-    onchange="importCSV(event)"
-  >
+<input
+  type="file"
+  id="csvImportFile"
+  accept=".csv"
+  style="display:none"
+  onchange="importCSV(event)"
+>
 
       <!-- 可選：日後加入完整備份功能時可使用 -->
       <!--
@@ -662,47 +578,12 @@ body::after {
   </section>
 </div>
 
-<!-- 管理題庫模式 -->
-<div id="manage" class="mode">
-  <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
-  
-  <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
-    <h2 style="margin:0;">📚 管理題庫</h2>
-    <button class="primary-btn" onclick="showMode('write')" 
-            style="width:auto; margin:0; padding:10px 18px; font-size:14px;">
-      ＋ 新增問題
-    </button>
-  </div>
-
-  <!-- 搜尋 + Tag 過濾 -->
-  <div class="card">
-    <label>搜尋問題</label>
-    <input type="search"
-           id="writeSearchInput"
-           placeholder="輸入關鍵字搜尋問題或答案..."
-           oninput="onWriteSearchInput()">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px;">
-      <label style="margin:0;">按 Tag 過濾（可多選）</label>
-      <button onclick="openTagManager()"
-              style="width:auto; margin:0; padding:6px 12px; font-size:13px;
-                     background:#f3e8ff; color:#7c3aed; box-shadow:none;">
-        🏷️ 管理 Tag
-      </button>
-    </div>
-    <div id="writeTagFilterList" class="tags" style="margin-top: 8px;"></div>
-  </div>
-
-  <!-- 問題列表 -->
-  <div id="questionCountBar" style="margin-top:16px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
-  <div id="questionList"></div>
-</div>
-
 <!-- 寫問題模式 -->
 <div id="write" class="mode">
-  <button class="back-btn" onclick="showMode('manage')">← 返回管理題庫</button>
-  <h2>✏️ 新增問題</h2>
+  <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
+  <h2>✏️ 寫問題</h2>
 
+  <!-- 新增問題表單 -->
   <div class="card">
     <label>問題</label>
     <textarea id="questionInput" placeholder="請輸入問題..." rows="3"></textarea>
@@ -710,22 +591,27 @@ body::after {
     <label>答案</label>
     <textarea id="answerInput" placeholder="請輸入答案..." rows="2"></textarea>
 
-    <label>分類 Tag（用逗號分隔）</label>
-    <input type="text" id="tagsInput" placeholder="例如：歷史, 動漫, 科學">
+<label>分類 Tag（用逗號分隔）</label>
+<input type="text" id="tagsInput" placeholder="例如：歷史, 動漫, 科學">
 
-    <div style="margin-top:10px;">
-      <div style="font-size:13px; color:#7c6b9b; margin-bottom:6px;">
-        現有 Tag（按一下加入）：
-      </div>
-      <div id="existingTagSuggestions" class="tags"></div>
-    </div>
+<div style="margin-top:10px;">
+  <div style="font-size:13px; color:#7c6b9b; margin-bottom:6px;">
+    現有 Tag（按一下加入）：
+  </div>
+  <div id="existingTagSuggestions" class="tags"></div>
+</div>
 
     <button class="primary-btn" onclick="addQuestion()" style="margin-top: 16px;">
       新增問題
     </button>
   </div>
-</div>
+<button onclick="openTagManager()" style="background:#f3e8ff; color:#7c3aed;">
+  🏷️ 管理 Tag
+</button>
 
+  <!-- 問題列表 -->
+  <div id="questionList" style="margin-top: 24px;"></div>
+</div>
 
 <!-- 問問題模式 -->
 <div id="quiz" class="mode">
@@ -771,13 +657,16 @@ body::after {
 
   <!-- 階段二：進行中的問答 -->
   <div id="quiz-play" style="display: none;">
-<div class="question-card-wrapper">
-<div id="questionCard" class="question-card">
-  <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
-  
-  <div id="currentAnswer" style="display: block; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 0; color: #6b5b95;"></div>
-</div>
-</div>
+    <div class="card" style="text-align: center;">
+      <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
+      
+      <div id="currentAnswer" style="display: none; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 16px; color: #6b5b95;"></div>
+
+      <button id="toggleAnswerBtn" onclick="toggleAnswer()" class="primary-btn">
+        顯示答案
+      </button>
+    </div>
+
     <!-- 標記誰答對 -->
     <div class="card" style="margin-top: 16px;">
       <label>誰答對了？（可多選）</label>
@@ -863,55 +752,10 @@ body::after {
   </div>
 </div>
 
-<!-- 貼上 CSV 文字匯入 -->
-<div id="pasteCSVModal"
-     style="display:none; position:fixed; inset:0; z-index:100;
-            background:rgba(74,63,107,0.45); padding:20px;
-            align-items:center; justify-content:center;">
-
-  <div style="background:white; width:min(520px, 100%); max-height:90vh;
-              overflow-y:auto; border-radius:24px; padding:24px;
-              box-shadow:0 10px 40px rgba(74,63,107,0.3);">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
-      <h2 style="margin:0;">📋 貼上 CSV 文字</h2>
-      <button onclick="closePasteCSV()"
-              style="width:36px; height:36px; padding:0; margin:0;
-                     background:#f3e8ff; color:#7c3aed;">
-        ✕
-      </button>
-    </div>
-
-    <p style="font-size:14px; color:#7c6b9b; margin-bottom:14px; line-height:1.5;">
-      直接將 CSV 內容貼上呢度（包含標題列）。<br>
-      支援問題／答案入面有換行（只要有用雙引號包住）。
-    </p>
-
-    <textarea id="pasteCSVInput"
-              rows="12"
-              placeholder="id,question,answer,tags
-1,太陽系有幾大行星？,八大行星,科學
-2,\"這題有
-換行\",答案,測試"></textarea>
-
-    <div class="btn-row" style="margin-top:18px;">
-      <button onclick="closePasteCSV()" style="background:#f3e8ff; color:#7c3aed;">
-        取消
-      </button>
-      <button class="primary-btn" onclick="importPastedCSV()">
-        開始匯入
-      </button>
-    </div>
-  </div>
-</div>
-
 <script>
   // ========== 資料 ==========
   let selectedTags = [];   // 目前選中的 Tag
   let questions = JSON.parse(localStorage.getItem('questions')) || [];
-// 寫問題模式用的搜尋與過濾
-  let writeSearchQuery = '';
-  let writeSelectedTags = [];
   let heardRecords = JSON.parse(localStorage.getItem('heardRecords')) || [];
   let players = [];
 // 曾經輸入過的玩家名稱，會儲存在瀏覽器 localStorage
@@ -930,35 +774,28 @@ let editingQuestionId = null;
 function showMode(mode) {
   document.getElementById('home').style.display = 'none';
   document.getElementById('write').classList.remove('active');
-  document.getElementById('manage').classList.remove('active');
   document.getElementById('quiz').classList.remove('active');
 
   if (mode === 'home') {
     document.getElementById('home').style.display = 'block';
   } else {
     document.getElementById(mode).classList.add('active');
+if (mode === 'write') {
+  renderQuestionList();
+  renderExistingTagSuggestions();
+}
+if (mode === 'quiz') {
+  renderTagFilter();
+  renderSavedPlayers();
+  renderPlayerList();
 
-    if (mode === 'manage') {
-      renderWriteTagFilter();
-      renderQuestionList();
-    }
-
-    if (mode === 'write') {
-      renderExistingTagSuggestions();
-    }
-
-    if (mode === 'quiz') {
-      renderTagFilter();
-      renderSavedPlayers();
-      renderPlayerList();
-
-      document.getElementById('quiz-setup').style.display = 'block';
-      document.getElementById('quiz-play').style.display = 'none';
-      document.getElementById('quiz-result').style.display = 'none';
-    }
+  // 重置畫面狀態
+  document.getElementById('quiz-setup').style.display = 'block';
+  document.getElementById('quiz-play').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'none';
+}
   }
 }
-
 // 將 Tag 文字轉換為乾淨、沒有重複的 Tag 陣列
 function normalizeTags(tagsText) {
   if (!tagsText) return [];
@@ -1008,102 +845,20 @@ function addQuestion() {
 
   saveQuestions();
 
-  // 清空輸入框
-  document.getElementById('questionInput').value = '';
-  document.getElementById('answerInput').value = '';
-  document.getElementById('tagsInput').value = '';
+document.getElementById('questionInput').value = '';
+document.getElementById('answerInput').value = '';
+document.getElementById('tagsInput').value = '';
 
-  if (document.activeElement) {
-    document.activeElement.blur();
-  }
-
-  // 新增後返回管理題庫
-  showMode('manage');
-  alert('問題已新增！');
+// 收起手機鍵盤，避免 Safari 保持輸入框的縮放狀態
+if (document.activeElement) {
+  document.activeElement.blur();
 }
 
-// 寫問題模式：搜尋輸入
-function onWriteSearchInput() {
-  const input = document.getElementById('writeSearchInput');
-  writeSearchQuery = input ? input.value.trim().toLowerCase() : '';
   renderQuestionList();
+  renderExistingTagSuggestions();
 }
-
-// 寫問題模式：渲染 Tag 過濾按鈕
-function renderWriteTagFilter() {
-  const el = document.getElementById('writeTagFilterList');
-  if (!el) return;
-
-  const allTags = getAllTags();
-
-  if (allTags.length === 0) {
-    el.innerHTML = '<span style="color:#9ca3af; font-size:13px;">目前還沒有 Tag</span>';
-    return;
-  }
-
-  el.innerHTML = allTags.map((tag, index) => {
-    const isSelected = writeSelectedTags.includes(tag);
-    return `
-      <span class="tag"
-            style="cursor:pointer; background:${isSelected ? '#c4b5fd' : '#f3e8ff'};
-                   color:${isSelected ? 'white' : '#7c3aed'};"
-            onclick="toggleWriteTag(${index})">
-        ${escapeHtml(tag)}
-      </span>
-    `;
-  }).join('');
-}
-
-// 寫問題模式：切換 Tag 過濾
-function toggleWriteTag(index) {
-  const allTags = getAllTags();
-  const tag = allTags[index];
-
-  if (!tag) return;
-
-  if (writeSelectedTags.includes(tag)) {
-    writeSelectedTags = writeSelectedTags.filter(t => t !== tag);
-  } else {
-    writeSelectedTags.push(tag);
-  }
-
-  renderWriteTagFilter();
-  renderQuestionList();
-}
-
 function renderQuestionList() {
   const listEl = document.getElementById('questionList');
-  const countBar = document.getElementById('questionCountBar');
-
-  // 過濾邏輯
-  let filtered = questions;
-
-  // 1. Tag 過濾
-  if (writeSelectedTags.length > 0) {
-    filtered = filtered.filter(q =>
-      (q.tags || []).some(tag => writeSelectedTags.includes(tag))
-    );
-  }
-
-  // 2. 關鍵字搜尋（問題 + 答案）
-  if (writeSearchQuery) {
-    filtered = filtered.filter(q => {
-      const qText = (q.question || '').toLowerCase();
-      const aText = (q.answer || '').toLowerCase();
-      return qText.includes(writeSearchQuery) || aText.includes(writeSearchQuery);
-    });
-  }
-
-  // 更新總數顯示
-  if (countBar) {
-    if (questions.length === 0) {
-      countBar.textContent = '';
-    } else if (filtered.length === questions.length) {
-      countBar.textContent = `目前共有 ${questions.length} 題`;
-    } else {
-      countBar.textContent = `顯示 ${filtered.length} / 共 ${questions.length} 題`;
-    }
-  }
 
   if (questions.length === 0) {
     listEl.innerHTML =
@@ -1111,13 +866,7 @@ function renderQuestionList() {
     return;
   }
 
-  if (filtered.length === 0) {
-    listEl.innerHTML =
-      '<p style="text-align:center; color:#9ca3af;">沒有符合條件的問題</p>';
-    return;
-  }
-
-  listEl.innerHTML = filtered.map(q => `
+  listEl.innerHTML = questions.map(q => `
     <div class="question-item">
       <button class="delete-btn"
               title="刪除問題"
@@ -1154,13 +903,12 @@ function renderQuestionList() {
     </div>
   `).join('');
 }
-function deleteQuestion(id) {
-  if (!confirm('確定要刪除這題嗎？')) return;
-  questions = questions.filter(q => q.id !== id);
-  saveQuestions();
-  renderQuestionList();
-  renderWriteTagFilter();
-}
+  function deleteQuestion(id) {
+    if (!confirm('確定要刪除這題嗎？')) return;
+    questions = questions.filter(q => q.id !== id);
+    saveQuestions();
+    renderQuestionList();
+  }
 function openEditQuestionModal(id) {
   const question = questions.find(q => q.id === id);
 
@@ -1177,13 +925,11 @@ function openEditQuestionModal(id) {
 
   const modal = document.getElementById('editQuestionModal');
   modal.style.display = 'flex';
-  document.body.classList.add('modal-open');
 }
 
 function closeEditQuestionModal() {
   editingQuestionId = null;
   document.getElementById('editQuestionModal').style.display = 'none';
-  document.body.classList.remove('modal-open');
 }
 
 function saveEditedQuestion() {
@@ -1220,10 +966,9 @@ if (document.activeElement) {
   document.activeElement.blur();
 }
 
-  closeEditQuestionModal();
+closeEditQuestionModal();
 
   renderQuestionList();
-  renderWriteTagFilter(); 
   renderExistingTagSuggestions();
 
   // 如果 Tag 管理視窗正開啟，同時更新它
@@ -1353,37 +1098,17 @@ function addSavedPlayer(index) {
   renderPlayerList();
 }
 
-// 刪除已儲存玩家（同時清除呢個名嘅聽過紀錄）
+// 刪除已儲存玩家
 function deleteSavedPlayer(index) {
   const name = savedPlayers[index];
 
-  if (!name) return;
+  if (!confirm(`確定要刪除已儲存玩家「${name}」嗎？`)) {
+    return;
+  }
 
-  const confirmed = confirm(
-    `確定要刪除已儲存玩家「${name}」嗎？\n\n` +
-    `刪除後，呢個名嘅所有「聽過紀錄」都會一併清除。`
-  );
-
-  if (!confirmed) return;
-
-  // 1. 從已儲存玩家名單移除
   savedPlayers.splice(index, 1);
   savePlayers();
-
-  // 2. 同時清除呢個玩家名嘅所有聽過紀錄
-  const beforeCount = heardRecords.length;
-  heardRecords = heardRecords.filter(r => r.playerName !== name);
-  localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
-
-  const removedCount = beforeCount - heardRecords.length;
-
   renderSavedPlayers();
-
-  if (removedCount > 0) {
-    alert(`已刪除玩家「${name}」，並清除咗 ${removedCount} 筆聽過紀錄。`);
-  } else {
-    alert(`已刪除玩家「${name}」。`);
-  }
 }
 
   // ========== 問問題模式 ==========
@@ -1472,89 +1197,71 @@ if (filteredQuestions.length === 0) {
     nextQuestion(true);
   }
 
-function nextQuestion(isFirst = false) {
-  if (!isFirst && currentQuestion) {
-    // 自動記錄本場所有玩家都聽過
-    players.forEach(playerName => {
-      const already = heardRecords.some(r => 
-        r.questionId === currentQuestion.id && r.playerName === playerName
-      );
-      if (!already) {
-        heardRecords.push({
-          questionId: currentQuestion.id,
-          playerName: playerName,
-          heardAt: Date.now()
-        });
-      }
+  function nextQuestion(isFirst = false) {
+    if (!isFirst && currentQuestion) {
+      // 自動記錄本場所有玩家都聽過
+      players.forEach(playerName => {
+        const already = heardRecords.some(r => 
+          r.questionId === currentQuestion.id && r.playerName === playerName
+        );
+        if (!already) {
+          heardRecords.push({
+            questionId: currentQuestion.id,
+            playerName: playerName,
+            heardAt: Date.now()
+          });
+        }
+      });
+      localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
+
+      // 加分
+      currentCorrect.forEach(name => {
+        if (sessionScores[name] !== undefined) {
+          sessionScores[name] += 1;
+        }
+      });
+    }
+
+const baseQuestions = selectedTags.length === 0
+  ? questions
+  : questions.filter(q => q.tags.some(tag => selectedTags.includes(tag)));
+
+const available = baseQuestions.filter(q => {
+      const heardBy = heardRecords
+        .filter(r => r.questionId === q.id)
+        .map(r => r.playerName);
+      return players.every(p => !heardBy.includes(p));
     });
-    localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
 
-    // 加分
-    currentCorrect.forEach(name => {
-      if (sessionScores[name] !== undefined) {
-        sessionScores[name] += 1;
-      }
-    });
-  }
+    if (available.length === 0) {
+      alert('所有玩家都已經聽過目前能出的題目了！');
+      endQuiz();
+      return;
+    }
 
-  const baseQuestions = selectedTags.length === 0
-    ? questions
-    : questions.filter(q => q.tags.some(tag => selectedTags.includes(tag)));
-
-  const available = baseQuestions.filter(q => {
-    const heardBy = heardRecords
-      .filter(r => r.questionId === q.id)
-      .map(r => r.playerName);
-    return players.every(p => !heardBy.includes(p));
-  });
-
-  if (available.length === 0) {
-    alert('所有玩家都已經聽過目前能出的題目了！');
-    endQuiz();
-    return;
-  }
-
-  const newQuestion = available[Math.floor(Math.random() * available.length)];
-  const card = document.getElementById('questionCard');
-
-  // 第一題：直接顯示，唔使動畫
-  if (isFirst) {
-    currentQuestion = newQuestion;
+    currentQuestion = available[Math.floor(Math.random() * available.length)];
     currentCorrect = [];
-    updateQuestionContent();
+
+    document.getElementById('currentQuestion').textContent = currentQuestion.question;
+    document.getElementById('currentAnswer').style.display = 'none';
+    document.getElementById('currentAnswer').textContent = '答案：' + currentQuestion.answer;
+    document.getElementById('toggleAnswerBtn').textContent = '顯示答案';
+
     renderCorrectPlayers();
-    return;
   }
 
-  // 之後每題：先向左滑出
-  card.classList.remove('slide-in-start', 'slide-in-end');
-  card.classList.add('slide-out');
+  function toggleAnswer() {
+    const answerEl = document.getElementById('currentAnswer');
+    const btn = document.getElementById('toggleAnswerBtn');
+    if (answerEl.style.display === 'none') {
+      answerEl.style.display = 'block';
+      btn.textContent = '隱藏答案';
+    } else {
+      answerEl.style.display = 'none';
+      btn.textContent = '顯示答案';
+    }
+  }
 
-  // 等滑出動畫完成後再換內容 + 由右滑入
-  setTimeout(() => {
-    currentQuestion = newQuestion;
-    currentCorrect = [];
-    updateQuestionContent();
-    renderCorrectPlayers();
-
-    // 瞬間移到右邊準備入場
-    card.classList.remove('slide-out');
-    card.classList.add('slide-in-start');
-
-    // 強制 reflow，然後觸發滑入
-    void card.offsetWidth;
-    card.classList.remove('slide-in-start');
-    card.classList.add('slide-in-end');
-  }, 350);
-}
-
-// 更新問題卡內容（抽離出嚟方便動畫用）
-function updateQuestionContent() {
-  document.getElementById('currentQuestion').textContent = currentQuestion.question;
-  const answerEl = document.getElementById('currentAnswer');
-  answerEl.style.display = 'block';
-  answerEl.textContent = '答案：' + currentQuestion.answer;
-}
   function renderCorrectPlayers() {
     const el = document.getElementById('correctPlayers');
     el.innerHTML = players.map(name => {
@@ -1859,44 +1566,43 @@ function importCSV(event) {
         })
         .filter(Boolean);
 
-// 成功讀取後
-if (importedQuestions.length === 0) {
-  alert('CSV 中沒有有效的題目');
-  return;
-}
+      if (importedQuestions.length === 0) {
+        alert('CSV 中沒有有效的題目');
+        return;
+      }
 
-// 確定 = 合併；取消 = 取消匯入
-const shouldImport = confirm(
-  `成功讀取 ${importedQuestions.length} 題。\n\n` +
-  `按「確定」合併到現有題庫。\n` +
-  `按「取消」取消匯入。`
-);
+      const shouldMerge = confirm(
+        `成功讀取 ${importedQuestions.length} 題。\n\n` +
+        `按「確定」合併到現有題庫。\n` +
+        `按「取消」覆蓋現有題庫。`
+      );
 
-if (!shouldImport) {
-  return; // 取消就什麼都不做
-}
+      if (shouldMerge) {
+        const existingIds = new Set(questions.map(q => q.id));
 
-// 只做合併
-const existingIds = new Set(questions.map(q => q.id));
-const newQuestions = importedQuestions.filter(q =>
-  !existingIds.has(q.id)
-);
+        const newQuestions = importedQuestions.filter(q =>
+          !existingIds.has(q.id)
+        );
 
-questions = questions.concat(newQuestions);
-alert(`成功合併 ${newQuestions.length} 題！`);
+        questions = questions.concat(newQuestions);
 
-saveQuestions();
+        alert(`成功合併 ${newQuestions.length} 題！`);
+      } else {
+        questions = importedQuestions;
+        alert(`已覆蓋為 ${questions.length} 題！`);
+      }
 
-// 更新畫面
-if (document.getElementById('write')?.classList.contains('active')) {
-  renderQuestionList();
-  renderWriteTagFilter();
-  renderExistingTagSuggestions();
-}
+      saveQuestions();
 
-if (typeof renderTagFilter === 'function') {
-  renderTagFilter();
-}
+      // 更新畫面
+      if (document.getElementById('write')?.classList.contains('active')) {
+        renderQuestionList();
+        renderExistingTagSuggestions();
+      }
+
+      if (typeof renderTagFilter === 'function') {
+        renderTagFilter();
+      }
 
     } catch (error) {
       console.error(error);
@@ -2024,11 +1730,10 @@ function renameTag(index) {
 
   saveQuestions();
 
-renderQuestionList();
-renderWriteTagFilter();
-renderExistingTagSuggestions();
-renderTagFilter();
-renderTagManager();
+  renderQuestionList();
+  renderExistingTagSuggestions();
+  renderTagFilter();
+  renderTagManager();
 
   alert(`Tag 已由「${oldTag}」改為「${newTag}」`);
 }
@@ -2061,119 +1766,14 @@ function deleteTag(index) {
 
   saveQuestions();
 
-renderQuestionList();
-renderWriteTagFilter();
-renderExistingTagSuggestions();
-renderTagFilter();
-renderTagManager();
+  renderQuestionList();
+  renderExistingTagSuggestions();
+  renderTagFilter();
+  renderTagManager();
 
   alert(`Tag「${tagToDelete}」已從所有題目中移除。`);
 }
-// ========== 貼上 CSV 文字匯入 ==========
-function openPasteCSV() {
-  document.getElementById('pasteCSVInput').value = '';
-  document.getElementById('pasteCSVModal').style.display = 'flex';
-}
 
-function closePasteCSV() {
-  document.getElementById('pasteCSVModal').style.display = 'none';
-}
-
-function importPastedCSV() {
-  let csvText = document.getElementById('pasteCSVInput').value.trim();
-
-  if (!csvText) {
-    alert('請先貼上 CSV 內容');
-    return;
-  }
-
-  // 移除可能出現的 BOM
-  csvText = csvText.replace(/^\uFEFF/, '');
-
-  try {
-    const rows = parseCSV(csvText);
-
-    if (rows.length < 2) {
-      alert('CSV 內容沒有有效題目資料');
-      return;
-    }
-
-    const headers = rows[0].map(header => header.trim().toLowerCase());
-
-    const questionIndex = headers.indexOf('question');
-    const answerIndex = headers.indexOf('answer');
-    const tagsIndex = headers.indexOf('tags');
-    const idIndex = headers.indexOf('id');
-
-    if (questionIndex === -1 || answerIndex === -1) {
-      alert('CSV 格式錯誤：必須包含 question 和 answer 欄位');
-      return;
-    }
-
-    const importedQuestions = rows
-      .slice(1)
-      .map(row => {
-        const question = (row[questionIndex] || '').trim();
-        const answer = (row[answerIndex] || '').trim();
-        const tagsText = (row[tagsIndex] || '').trim();
-
-        if (!question || !answer) return null;
-
-        const tags = tagsText
-          ? tagsText.split(/[、,，]/).map(tag => tag.trim()).filter(Boolean)
-          : [];
-
-        return {
-          id: idIndex !== -1 && row[idIndex]
-            ? Number(row[idIndex])
-            : Date.now() + Math.random(),
-          question,
-          answer,
-          tags: [...new Set(tags)]
-        };
-      })
-      .filter(Boolean);
-
-    if (importedQuestions.length === 0) {
-      alert('沒有讀取到有效的題目');
-      return;
-    }
-
-    // 確定 = 合併；取消 = 取消匯入（什麼都不做）
-    const shouldImport = confirm(
-      `成功讀取 ${importedQuestions.length} 題。\n\n` +
-      `按「確定」合併到現有題庫。\n` +
-      `按「取消」取消匯入。`
-    );
-
-    if (!shouldImport) {
-      return; // 取消就直接離開
-    }
-
-    // 只做合併
-    const existingIds = new Set(questions.map(q => q.id));
-    const newQuestions = importedQuestions.filter(q => !existingIds.has(q.id));
-    questions = questions.concat(newQuestions);
-    alert(`成功合併 ${newQuestions.length} 題！`);
-
-    saveQuestions();
-    closePasteCSV();
-
-    // 更新畫面
-if (document.getElementById('write')?.classList.contains('active')) {
-  renderQuestionList();
-  renderWriteTagFilter(); 
-  renderExistingTagSuggestions();
-}
-    if (typeof renderTagFilter === 'function') {
-      renderTagFilter();
-    }
-
-  } catch (error) {
-    console.error(error);
-    alert('CSV 解析失敗，請確認格式正確');
-  }
-}
 </script>
 </body>
 </html>
