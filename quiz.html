@@ -693,11 +693,21 @@ body::after {
   🏷️ 管理 Tag
 </button>
 
-<div id="questionCountBar" style="margin-top:24px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
-<div id="questionList"></div>
+  <!-- 搜尋 + Tag 過濾 -->
+  <div class="card" style="margin-top: 20px;">
+    <label>搜尋問題</label>
+    <input type="search"
+           id="writeSearchInput"
+           placeholder="輸入關鍵字搜尋問題或答案..."
+           oninput="onWriteSearchInput()">
+
+    <label style="margin-top:14px;">按 Tag 過濾（可多選）</label>
+    <div id="writeTagFilterList" class="tags" style="margin-top: 8px;"></div>
+  </div>
 
   <!-- 問題列表 -->
-  <div id="questionList" style="margin-top: 24px;"></div>
+  <div id="questionCountBar" style="margin-top:20px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
+  <div id="questionList"></div>
 </div>
 
 <!-- 問問題模式 -->
@@ -882,6 +892,9 @@ body::after {
   // ========== 資料 ==========
   let selectedTags = [];   // 目前選中的 Tag
   let questions = JSON.parse(localStorage.getItem('questions')) || [];
+// 寫問題模式用的搜尋與過濾
+  let writeSearchQuery = '';
+  let writeSelectedTags = [];
   let heardRecords = JSON.parse(localStorage.getItem('heardRecords')) || [];
   let players = [];
 // 曾經輸入過的玩家名稱，會儲存在瀏覽器 localStorage
@@ -907,6 +920,7 @@ function showMode(mode) {
   } else {
     document.getElementById(mode).classList.add('active');
 if (mode === 'write') {
+  renderWriteTagFilter();
   renderQuestionList();
   renderExistingTagSuggestions();
 }
@@ -971,27 +985,102 @@ function addQuestion() {
 
   saveQuestions();
 
-document.getElementById('questionInput').value = '';
-document.getElementById('answerInput').value = '';
-document.getElementById('tagsInput').value = '';
+  // 清空輸入框
+  document.getElementById('questionInput').value = '';
+  document.getElementById('answerInput').value = '';
+  document.getElementById('tagsInput').value = '';
 
-// 收起手機鍵盤，避免 Safari 保持輸入框的縮放狀態
-if (document.activeElement) {
-  document.activeElement.blur();
-}
+  // 收起手機鍵盤
+  if (document.activeElement) {
+    document.activeElement.blur();
+  }
 
   renderQuestionList();
+  renderWriteTagFilter();
   renderExistingTagSuggestions();
 }
+
+// 寫問題模式：搜尋輸入
+function onWriteSearchInput() {
+  const input = document.getElementById('writeSearchInput');
+  writeSearchQuery = input ? input.value.trim().toLowerCase() : '';
+  renderQuestionList();
+}
+
+// 寫問題模式：渲染 Tag 過濾按鈕
+function renderWriteTagFilter() {
+  const el = document.getElementById('writeTagFilterList');
+  if (!el) return;
+
+  const allTags = getAllTags();
+
+  if (allTags.length === 0) {
+    el.innerHTML = '<span style="color:#9ca3af; font-size:13px;">目前還沒有 Tag</span>';
+    return;
+  }
+
+  el.innerHTML = allTags.map((tag, index) => {
+    const isSelected = writeSelectedTags.includes(tag);
+    return `
+      <span class="tag"
+            style="cursor:pointer; background:${isSelected ? '#c4b5fd' : '#f3e8ff'};
+                   color:${isSelected ? 'white' : '#7c3aed'};"
+            onclick="toggleWriteTag(${index})">
+        ${escapeHtml(tag)}
+      </span>
+    `;
+  }).join('');
+}
+
+// 寫問題模式：切換 Tag 過濾
+function toggleWriteTag(index) {
+  const allTags = getAllTags();
+  const tag = allTags[index];
+
+  if (!tag) return;
+
+  if (writeSelectedTags.includes(tag)) {
+    writeSelectedTags = writeSelectedTags.filter(t => t !== tag);
+  } else {
+    writeSelectedTags.push(tag);
+  }
+
+  renderWriteTagFilter();
+  renderQuestionList();
+}
+
 function renderQuestionList() {
   const listEl = document.getElementById('questionList');
   const countBar = document.getElementById('questionCountBar');
 
+  // 過濾邏輯
+  let filtered = questions;
+
+  // 1. Tag 過濾
+  if (writeSelectedTags.length > 0) {
+    filtered = filtered.filter(q =>
+      (q.tags || []).some(tag => writeSelectedTags.includes(tag))
+    );
+  }
+
+  // 2. 關鍵字搜尋（問題 + 答案）
+  if (writeSearchQuery) {
+    filtered = filtered.filter(q => {
+      const qText = (q.question || '').toLowerCase();
+      const aText = (q.answer || '').toLowerCase();
+      return qText.includes(writeSearchQuery) || aText.includes(writeSearchQuery);
+    });
+  }
+
   // 更新總數顯示
   if (countBar) {
-    countBar.textContent = questions.length > 0 
-      ? `目前共有 ${questions.length} 題` 
-      : '';
+    if (questions.length === 0) {
+      countBar.textContent = '';
+    } else if (filtered.length === questions.length) {
+      countBar.textContent = `目前共有 ${questions.length} 題`;
+    } else {
+      countBar.textContent = `顯示 ${filtered.length} / 共 ${questions.length} 題`;
+    }
   }
 
   if (questions.length === 0) {
@@ -1000,7 +1089,13 @@ function renderQuestionList() {
     return;
   }
 
-  listEl.innerHTML = questions.map(q => `
+  if (filtered.length === 0) {
+    listEl.innerHTML =
+      '<p style="text-align:center; color:#9ca3af;">沒有符合條件的問題</p>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(q => `
     <div class="question-item">
       <button class="delete-btn"
               title="刪除問題"
@@ -1037,12 +1132,13 @@ function renderQuestionList() {
     </div>
   `).join('');
 }
-  function deleteQuestion(id) {
-    if (!confirm('確定要刪除這題嗎？')) return;
-    questions = questions.filter(q => q.id !== id);
-    saveQuestions();
-    renderQuestionList();
-  }
+function deleteQuestion(id) {
+  if (!confirm('確定要刪除這題嗎？')) return;
+  questions = questions.filter(q => q.id !== id);
+  saveQuestions();
+  renderQuestionList();
+  renderWriteTagFilter();
+}
 function openEditQuestionModal(id) {
   const question = questions.find(q => q.id === id);
 
@@ -1102,9 +1198,10 @@ if (document.activeElement) {
   document.activeElement.blur();
 }
 
-closeEditQuestionModal();
+  closeEditQuestionModal();
 
   renderQuestionList();
+  renderWriteTagFilter(); 
   renderExistingTagSuggestions();
 
   // 如果 Tag 管理視窗正開啟，同時更新它
@@ -1771,6 +1868,7 @@ saveQuestions();
 // 更新畫面
 if (document.getElementById('write')?.classList.contains('active')) {
   renderQuestionList();
+  renderWriteTagFilter();
   renderExistingTagSuggestions();
 }
 
@@ -1904,10 +2002,11 @@ function renameTag(index) {
 
   saveQuestions();
 
-  renderQuestionList();
-  renderExistingTagSuggestions();
-  renderTagFilter();
-  renderTagManager();
+renderQuestionList();
+renderWriteTagFilter();
+renderExistingTagSuggestions();
+renderTagFilter();
+renderTagManager();
 
   alert(`Tag 已由「${oldTag}」改為「${newTag}」`);
 }
@@ -1940,10 +2039,11 @@ function deleteTag(index) {
 
   saveQuestions();
 
-  renderQuestionList();
-  renderExistingTagSuggestions();
-  renderTagFilter();
-  renderTagManager();
+renderQuestionList();
+renderWriteTagFilter();
+renderExistingTagSuggestions();
+renderTagFilter();
+renderTagManager();
 
   alert(`Tag「${tagToDelete}」已從所有題目中移除。`);
 }
@@ -2038,10 +2138,11 @@ function importPastedCSV() {
     closePasteCSV();
 
     // 更新畫面
-    if (document.getElementById('write')?.classList.contains('active')) {
-      renderQuestionList();
-      renderExistingTagSuggestions();
-    }
+if (document.getElementById('write')?.classList.contains('active')) {
+  renderQuestionList();
+  renderWriteTagFilter(); 
+  renderExistingTagSuggestions();
+}
     if (typeof renderTagFilter === 'function') {
       renderTagFilter();
     }
