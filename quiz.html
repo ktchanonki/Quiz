@@ -2,828 +2,594 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>🏆競技問答</title>
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background: linear-gradient(135deg, #e8d5f5 0%, #f3e8ff 50%, #fce7f3 100%);
-    min-height: 100vh;
-    color: #4a3f6b;
-    padding: 20px;
-  }
-
-  .container {
-    max-width: 420px;
-    margin: 0 auto;
-  }
-
-  h1 {
-    text-align: center;
-    font-size: 1.8rem;
-    margin-bottom: 30px;
-    color: #6b5b95;
-    font-weight: 700;
-  }
-
-  h2 {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    color: #6b5b95;
-  }
-
-  button {
-    background: white;
-    border: none;
-    border-radius: 999px;
-    padding: 14px 24px;
-    font-size: 16px;
-    color: #6b5b95;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(155, 135, 200, 0.2);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    width: 100%;
-    margin-bottom: 12px;
-  }
-
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(155, 135, 200, 0.3);
-  }
-
-  button:active {
-    transform: translateY(0);
-  }
-
-  .primary-btn {
-    background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
-    color: white;
-  }
-
-  .mode {
-    display: none;
-    background: white;
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: 0 10px 40px rgba(155, 135, 200, 0.15);
-  }
-
-  .mode.active {
-    display: block;
-  }
-
-  #home {
-    text-align: center;
-  }
-
-  .back-btn {
-    background: #f3e8ff;
-    color: #7c3aed;
-    margin-bottom: 20px;
-  }
-.btn-row {
-  display: flex;
-  gap: 12px;
-}
-
-.btn-row button {
-  flex: 1;
-  margin-bottom: 0;
-}
-.card {
-  background: #faf5ff;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 16px;
-}
-
-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #7c3aed;
-  margin-bottom: 6px;
-  margin-top: 12px;
-}
-
-label:first-child {
-  margin-top: 0;
-}
-
-textarea,
-input[type="text"],
-input[type="search"],
-input[type="number"] {
-  width: 100%;
-  padding: 12px 14px;
-  border: 2px solid #e9d5ff;
-  border-radius: 14px;
-  font-size: 16px;
-  line-height: 1.4;
-  background: white;
-  color: #4a3f6b;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-textarea:focus, input[type="text"]:focus {
-  border-color: #c4b5fd;
-}
-
-.question-item {
-  background: white;
-  border-radius: 18px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 4px 12px rgba(155, 135, 200, 0.1);
-  position: relative;
-}
-
-.question-item .q-text {
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: #4a3f6b;
-}
-
-.question-item .a-text {
-  font-size: 14px;
-  color: #7c6b9b;
-  margin-bottom: 8px;
-}
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.tag {
-  background: #f3e8ff;
-  color: #7c3aed;
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #fee2e2;
-  color: #ef4444;
-  border: none;
-  border-radius: 999px;
-  width: 32px;
-  height: 32px;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: none;
-  padding: 0;
-  margin: 0;
-}
-/* ========== 首頁 Dashboard UI ========== */
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  padding: 0;
-}
-
-.container {
-  max-width: 900px;
+  background: linear-gradient(135deg, #e8d5f5 0%, #f3e8ff 45%, #fce7f3 100%);
+  background-attachment: fixed;
+  background-size: cover;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 18px;
-}
-
-h1 {
-  margin-bottom: 8px;
-  font-size: clamp(2rem, 6vw, 3rem);
-  letter-spacing: 0.03em;
-}
-
-.home-subtitle {
-  margin-bottom: 24px;
-  color: #7c6b9b;
-  font-size: clamp(0.9rem, 3vw, 1.05rem);
-  text-align: center;
-}
-
-.home-panel {
-  width: 100%;
-  padding: clamp(18px, 4vw, 30px);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 28px;
-  box-shadow: 0 12px 35px rgba(155, 135, 200, 0.18);
-}
-
-.home-main-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.home-action-card {
-  min-height: 170px;
-  padding: 22px 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 0;
-  border-radius: 22px;
-  color: white;
-  text-align: center;
-  box-shadow: 0 8px 20px rgba(155, 135, 200, 0.2);
-}
-
-.home-action-card:hover {
-  transform: translateY(-4px);
-}
-
-.home-action-card.write-card {
-  background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
-}
-
-.home-action-card.quiz-card {
-  background: linear-gradient(135deg, #f9a8d4 0%, #e879b5 100%);
-}
-
-.home-action-icon {
-  margin-bottom: 8px;
-  font-size: clamp(2.4rem, 8vw, 3.8rem);
-  line-height: 1;
-}
-
-.home-action-title {
-  margin-bottom: 5px;
-  font-size: clamp(1.05rem, 3.5vw, 1.35rem);
-  font-weight: 800;
-}
-
-.home-action-desc {
-  max-width: 170px;
-  font-size: clamp(0.75rem, 2.5vw, 0.9rem);
-  font-weight: 400;
-  line-height: 1.45;
-  opacity: 0.92;
-}
-
-.home-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 22px 0 14px;
-  color: #9b8baa;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.home-divider::before,
-.home-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #eadcf5;
-}
-
-.home-tools {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.home-tool-btn {
-  min-height: 58px;
-  margin: 0;
-  padding: 10px;
-  color: #7c3aed;
-  font-size: clamp(0.8rem, 2.8vw, 0.95rem);
-  background: #f7f0ff;
-  border: 1px solid #ead5ff;
-  border-radius: 16px;
-  box-shadow: none;
-}
-
-.home-tool-btn:hover {
-  background: #eee0ff;
-  box-shadow: none;
-}
-
-.home-footer-note {
-  margin-top: 16px;
-  color: #9b8baa;
-  font-size: 12px;
-  text-align: center;
-}
-
-/* 手機橫向 16:9，例如 844 × 390、932 × 430 */
-@media screen and (max-height: 540px) and (orientation: landscape) {
-  .container {
-    max-width: 1000px;
-    padding: 12px 20px;
-    justify-content: flex-start;
-  }
-
-  h1 {
-    margin-top: 0;
-    margin-bottom: 2px;
-    font-size: 1.65rem;
-  }
-
-  .home-subtitle {
-    margin-bottom: 12px;
-    font-size: 0.82rem;
-  }
-
-  .home-panel {
-    padding: 14px;
-    border-radius: 20px;
-  }
-
-  .home-main-actions {
-    gap: 12px;
-  }
-
-  .home-action-card {
-    min-height: 108px;
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .home-action-icon {
-    margin-bottom: 3px;
-    font-size: 2rem;
-  }
-
-  .home-action-title {
-    margin-bottom: 2px;
-    font-size: 1rem;
-  }
-
-  .home-action-desc {
-    max-width: none;
-    font-size: 0.72rem;
-  }
-
-  .home-divider {
-    margin: 12px 0 8px;
-  }
-
-  .home-tools {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .home-tool-btn {
-    min-height: 42px;
-    padding: 7px;
-    border-radius: 12px;
-    font-size: 0.76rem;
-  }
-
-  .home-footer-note {
-    margin-top: 8px;
-    font-size: 10px;
-  }
-}
-
-/* 較窄的直向手機 */
-@media screen and (max-width: 360px) {
-  .container {
-    padding: 12px;
-  }
-
-  .home-panel {
-    padding: 14px;
-  }
-
-  .home-main-actions {
-    gap: 10px;
-  }
-
-  .home-action-card {
-    min-height: 145px;
-    padding: 14px 8px;
-  }
-
-  .home-action-desc {
-    font-size: 0.72rem;
-  }
-}
-
-/* 防止水平滑動造成整個版面移位 */
-.mode,
-.card,
-.question-item,
-.home-panel {
-  max-width: 100%;
+  position: relative;
   overflow-x: hidden;
+  color: #4a3f6b;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* 避免圖片、長字串或網址撐開畫面 */
-img,
-video,
-iframe {
-  max-width: 100%;
+/* 左上光暈 */
+body::before {
+  content: "";
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  background: #c4b5fd;
+  top: -120px;
+  left: -100px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
 }
 
-textarea,
-input,
-button,
-select {
-  max-width: 100%;
+/* 右下光暈 */
+body::after {
+  content: "";
+  position: fixed;
+  width: 380px;
+  height: 380px;
+  background: #f9a8d4;
+  bottom: -100px;
+  right: -80px;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* 長問題和答案不要把畫面橫向撐開 */
-.q-text,
-.a-text,
-#currentQuestion,
-#currentAnswer {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
+    .container {
+      max-width: 900px;
+      min-height: 100vh;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 18px;
+      position: relative;
+      z-index: 1;
+    }
 
-/* Modal 開啟時，背景不可跟著滑動 */
-#editQuestionModal,
-#tagManagerModal {
-  overscroll-behavior: none;
-  touch-action: none;
-}
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: clamp(2rem, 6vw, 3rem);
+      color: #6b5b95;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
 
-#editQuestionModal > div,
-#tagManagerModal > div {
-  max-height: 90dvh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-}
+    h2 { font-size: 1.4rem; margin-bottom: 20px; color: #6b5b95; }
 
-/* 手機直向 */
-@media screen and (max-width: 600px) {
-  .container {
-    padding: 12px;
-  }
+    button {
+      background: white;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 24px;
+      font-size: 16px;
+      color: #6b5b95;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(155, 135, 200, 0.2);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 100%;
+      margin-bottom: 12px;
+      max-width: 100%;
+    }
+    button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(155, 135, 200, 0.3); }
+    button:active { transform: translateY(0); }
 
-  .mode.active {
-    max-height: calc(100dvh - 70px);
-  }
-}
+    .primary-btn {
+      background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
+      color: white;
+    }
 
-/* 手機橫向 16:9 */
-@media screen and (orientation: landscape) and (max-height: 540px) {
-  .container {
-    padding: 8px 16px;
-  }
+    .back-btn { background: #f3e8ff; color: #7c3aed; margin-bottom: 20px; }
 
-  .container > h1 {
-    margin-bottom: 6px;
-    font-size: 1.5rem;
-  }
+    .mode {
+      display: none;
+      background: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(155, 135, 200, 0.15);
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    .mode.active { display: block; }
 
-  .mode.active {
-    max-height: calc(100dvh - 48px);
-  }
-}
-/* 防止 iPhone 點擊輸入欄時自動縮放 */
-input,
-textarea,
-select {
-  font-size: 16px;
-}
-</style>
+    #home { text-align: center; }
+
+    .btn-row { display: flex; gap: 12px; }
+    .btn-row button { flex: 1; margin-bottom: 0; }
+
+    .card {
+      background: #faf5ff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #7c3aed;
+      margin-bottom: 6px;
+      margin-top: 12px;
+    }
+    label:first-child { margin-top: 0; }
+
+    textarea, input[type="text"], input[type="search"], input[type="number"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e9d5ff;
+      border-radius: 14px;
+      font-size: 16px;
+      line-height: 1.4;
+      background: white;
+      color: #4a3f6b;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+      max-width: 100%;
+    }
+    textarea:focus, input[type="text"]:focus, input[type="search"]:focus { border-color: #c4b5fd; }
+
+    .question-item {
+      background: white;
+      border-radius: 18px;
+      padding: 16px;
+      padding-right: 96px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(155, 135, 200, 0.1);
+      position: relative;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    .question-item .q-text { font-weight: 600; margin-bottom: 6px; color: #4a3f6b; }
+    .question-item .a-text { font-size: 14px; color: #7c6b9b; margin-bottom: 8px; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      background: #f3e8ff;
+      color: #7c3aed;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: #fee2e2;
+      color: #ef4444;
+      border: none;
+      border-radius: 999px;
+      width: 32px;
+      height: 32px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 首頁 */
+    .home-panel {
+      width: 100%;
+      padding: clamp(18px, 4vw, 30px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      border-radius: 28px;
+      box-shadow: 0 12px 35px rgba(155, 135, 200, 0.18);
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    .home-main-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .home-action-card {
+      min-height: 170px;
+      padding: 22px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 0;
+      border-radius: 22px;
+      color: white;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(155, 135, 200, 0.2);
+    }
+    .home-action-card:hover { transform: translateY(-4px); }
+    .home-action-card.write-card { background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%); }
+    .home-action-card.quiz-card { background: linear-gradient(135deg, #f9a8d4 0%, #e879b5 100%); }
+    .home-action-icon { margin-bottom: 8px; font-size: clamp(2.4rem, 8vw, 3.8rem); line-height: 1; }
+    .home-action-title { margin-bottom: 5px; font-size: clamp(1.05rem, 3.5vw, 1.35rem); font-weight: 800; }
+    .home-action-desc { max-width: 170px; font-size: clamp(0.75rem, 2.5vw, 0.9rem); font-weight: 400; line-height: 1.45; opacity: 0.92; }
+
+    .home-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 14px;
+      color: #9b8baa;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .home-divider::before, .home-divider::after { content: ""; flex: 1; height: 1px; background: #eadcf5; }
+
+    .home-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .home-tool-btn {
+      min-height: 58px;
+      margin: 0;
+      padding: 10px;
+      color: #7c3aed;
+      font-size: clamp(0.8rem, 2.8vw, 0.95rem);
+      background: #f7f0ff;
+      border: 1px solid #ead5ff;
+      border-radius: 16px;
+      box-shadow: none;
+    }
+    .home-tool-btn:hover { background: #eee0ff; box-shadow: none; }
+    .home-footer-note { margin-top: 16px; color: #9b8baa; font-size: 12px; text-align: center; }
+
+    /* 問題卡動畫 */
+    .question-card-wrapper { position: relative; overflow: hidden; min-height: 180px; }
+    .question-card {
+      background: #faf5ff;
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+      will-change: transform, opacity;
+    }
+    .question-card.slide-out { transform: translateX(-110%) scale(0.95); opacity: 0; }
+    .question-card.slide-in-start { transform: translateX(110%) scale(0.95); opacity: 0; transition: none; }
+    .question-card.slide-in-end { transform: translateX(0) scale(1); opacity: 1; }
+
+    .q-text, .a-text, #currentQuestion, #currentAnswer {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    /* Modal */
+    #editQuestionModal, #tagManagerModal, #pasteCSVModal {
+      overscroll-behavior: none;
+      touch-action: none;
+    }
+    #editQuestionModal > div, #tagManagerModal > div, #pasteCSVModal > div {
+      max-height: 90dvh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+      -webkit-overflow-scrolling: touch;
+    }
+    body.modal-open {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+
+    input, textarea, select { font-size: 16px; }
+
+    /* 響應式 */
+    @media screen and (max-height: 540px) and (orientation: landscape) {
+      .container { max-width: 1000px; padding: 12px 20px; justify-content: flex-start; }
+      h1 { margin-top: 0; margin-bottom: 2px; font-size: 1.65rem; }
+      .home-panel { padding: 14px; border-radius: 20px; }
+      .home-main-actions { gap: 12px; }
+      .home-action-card { min-height: 108px; padding: 12px; border-radius: 16px; }
+      .home-action-icon { margin-bottom: 3px; font-size: 2rem; }
+      .home-action-title { margin-bottom: 2px; font-size: 1rem; }
+      .home-action-desc { max-width: none; font-size: 0.72rem; }
+      .home-divider { margin: 12px 0 8px; }
+      .home-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .home-tool-btn { min-height: 42px; padding: 7px; border-radius: 12px; font-size: 0.76rem; }
+      .home-footer-note { margin-top: 8px; font-size: 10px; }
+      .mode.active { max-height: calc(100dvh - 48px); }
+    }
+    @media screen and (max-width: 600px) {
+      .container { padding: 12px; }
+      .mode.active { max-height: calc(100dvh - 70px); }
+    }
+    @media screen and (max-width: 360px) {
+      .home-panel { padding: 14px; }
+      .home-main-actions { gap: 10px; }
+      .home-action-card { min-height: 145px; padding: 14px 8px; }
+      .home-action-desc { font-size: 0.72rem; }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>🏆競技問答</h1>
 
-<!-- 首頁 -->
-<div id="home">
-</br>
+    <!-- 首頁 -->
+    <div id="home">
+      <br>
+      <section class="home-panel">
+        <div class="home-main-actions">
+          <button class="home-action-card write-card" onclick="showMode('manage')">
+            <span class="home-action-icon">📚</span>
+            <span class="home-action-title">管理題庫</span>
+            <span class="home-action-desc">搜尋、過濾、編輯<br>整理所有問題</span>
+          </button>
+          <button class="home-action-card quiz-card" onclick="showMode('quiz')">
+            <span class="home-action-icon">❓</span>
+            <span class="home-action-title">開始問答</span>
+            <span class="home-action-desc">選擇玩家及分類<br>立即開始競技</span>
+          </button>
+        </div>
 
-  <section class="home-panel">
+        <div class="home-divider">題庫工具</div>
 
-    <div class="home-main-actions">
-      <button class="home-action-card write-card" onclick="showMode('write')">
-        <span class="home-action-icon">✏️</span>
-        <span class="home-action-title">建立題庫</span>
-        <span class="home-action-desc">
-          新增、編輯、刪除問題<br>及管理分類 Tag
-        </span>
-      </button>
+        <div class="home-tools">
+          <button onclick="exportCSV()" class="home-tool-btn">📄 匯出 CSV</button>
+          <button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">📥 匯入 CSV</button>
+          <button onclick="openPasteCSV()" class="home-tool-btn">📋 貼上 CSV</button>
+          <input type="file" id="csvImportFile" accept=".csv" style="display:none" onchange="importCSV(event)">
+        </div>
 
-      <button class="home-action-card quiz-card" onclick="showMode('quiz')">
-        <span class="home-action-icon">❓</span>
-        <span class="home-action-title">開始問答</span>
-        <span class="home-action-desc">
-          選擇玩家及分類<br>立即開始競技
-        </span>
-      </button>
+        <p class="home-footer-note">題庫會自動儲存在此裝置的瀏覽器中。</p>
+      </section>
     </div>
 
-    <div class="home-divider">
-      題庫工具
+    <!-- 管理題庫 -->
+    <div id="manage" class="mode">
+      <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
+        <h2 style="margin:0;">📚 管理題庫</h2>
+        <button class="primary-btn" onclick="showMode('write')" style="width:auto; margin:0; padding:10px 18px; font-size:14px;">
+          ＋ 新增問題
+        </button>
+      </div>
+
+      <div class="card">
+        <label>搜尋問題</label>
+        <input type="search" id="writeSearchInput" placeholder="輸入關鍵字搜尋問題或答案..." oninput="onWriteSearchInput()">
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; gap:10px;">
+          <label style="margin:0;">按 Tag 過濾（可多選）</label>
+          <button onclick="openTagManager()" style="width:auto; margin:0; padding:6px 12px; font-size:13px; background:#f3e8ff; color:#7c3aed; box-shadow:none;">
+            🏷️ 管理 Tag
+          </button>
+        </div>
+        <div id="writeTagFilterList" class="tags" style="margin-top:8px;"></div>
+      </div>
+
+      <div id="questionCountBar" style="margin-top:16px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
+      <div id="questionList"></div>
     </div>
 
-    <div class="home-tools">
-<button onclick="exportCSV()" class="home-tool-btn">
-  📄 匯出 CSV
-</button>
+    <!-- 新增問題 -->
+    <div id="write" class="mode">
+      <button class="back-btn" onclick="showMode('manage')">← 返回管理題庫</button>
+      <h2>✏️ 新增問題</h2>
 
-<button onclick="document.getElementById('csvImportFile').click()" class="home-tool-btn">
-  📥 匯入 CSV
-</button>
+      <div class="card">
+        <label>問題</label>
+        <textarea id="questionInput" placeholder="請輸入問題..." rows="3"></textarea>
 
-<input
-  type="file"
-  id="csvImportFile"
-  accept=".csv"
-  style="display:none"
-  onchange="importCSV(event)"
->
+        <label>答案</label>
+        <textarea id="answerInput" placeholder="請輸入答案..." rows="2"></textarea>
 
-      <!-- 可選：日後加入完整備份功能時可使用 -->
-      <!--
-      <button class="home-tool-btn" onclick="exportBackup()">
-        💾 完整備份
-      </button>
+        <label>分類 Tag（用逗號分隔）</label>
+        <input type="text" id="tagsInput" placeholder="例如：歷史, 動漫, 科學">
 
-      <button class="home-tool-btn" onclick="showPlayerManager()">
-        👥 管理玩家
-      </button>
-      -->
+        <div style="margin-top:10px;">
+          <div style="font-size:13px; color:#7c6b9b; margin-bottom:6px;">現有 Tag（按一下加入）：</div>
+          <div id="existingTagSuggestions" class="tags"></div>
+        </div>
+
+        <button class="primary-btn" onclick="addQuestion()" style="margin-top:16px;">新增問題</button>
+      </div>
     </div>
 
-    <input
-      type="file"
-      id="importFile"
-      accept=".json"
-      style="display:none"
-      onchange="importQuestions(event)"
-    >
+    <!-- 問答模式 -->
+    <div id="quiz" class="mode">
+      <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
+      <h2>❓ 問問題</h2>
 
-    <p class="home-footer-note">
-      題庫會自動儲存在此裝置的瀏覽器中。
-    </p>
-  </section>
-</div>
+      <div id="quiz-setup">
+        <div class="card">
+          <label>玩家名稱</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="playerInput" list="savedPlayerOptions" placeholder="輸入或選擇玩家名稱" style="flex:1;" onkeydown="handlePlayerInput(event)">
+            <datalist id="savedPlayerOptions"></datalist>
+            <button onclick="addPlayer()" style="width:auto; padding:0 16px; margin:0;">新增</button>
+          </div>
 
-<!-- 寫問題模式 -->
-<div id="write" class="mode">
-  <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
-  <h2>✏️ 寫問題</h2>
+          <label style="margin-top:16px;">已儲存玩家（按一下加入本場）</label>
+          <div id="savedPlayerList" class="tags" style="margin-top:8px;"></div>
 
-  <!-- 新增問題表單 -->
-  <div class="card">
-    <label>問題</label>
-    <textarea id="questionInput" placeholder="請輸入問題..." rows="3"></textarea>
+          <label style="margin-top:16px;">本場玩家</label>
+          <div id="playerList" class="tags" style="margin-top:8px;"></div>
+        </div>
 
-    <label>答案</label>
-    <textarea id="answerInput" placeholder="請輸入答案..." rows="2"></textarea>
+        <div class="card">
+          <label>選擇題目分類（可多選，不選 = 全部）</label>
+          <div id="tagFilterList" class="tags" style="margin-top:10px;"></div>
+        </div>
 
-<label>分類 Tag（用逗號分隔）</label>
-<input type="text" id="tagsInput" placeholder="例如：歷史, 動漫, 科學">
+        <button class="primary-btn" onclick="startQuiz()">開始問答</button>
+      </div>
 
-<div style="margin-top:10px;">
-  <div style="font-size:13px; color:#7c6b9b; margin-bottom:6px;">
-    現有 Tag（按一下加入）：
-  </div>
-  <div id="existingTagSuggestions" class="tags"></div>
-</div>
+      <div id="quiz-play" style="display:none;">
+        <div class="question-card-wrapper">
+          <div id="questionCard" class="question-card">
+            <div id="currentQuestion" style="font-size:1.3rem; font-weight:600; margin-bottom:16px; min-height:60px;"></div>
+            <div id="currentAnswer" style="display:block; background:#f3e8ff; border-radius:14px; padding:14px; color:#6b5b95;"></div>
+          </div>
+        </div>
 
-    <button class="primary-btn" onclick="addQuestion()" style="margin-top: 16px;">
-      新增問題
-    </button>
-  </div>
-<button onclick="openTagManager()" style="background:#f3e8ff; color:#7c3aed;">
-  🏷️ 管理 Tag
-</button>
+        <div class="card" style="margin-top:16px;">
+          <label>誰答對了？（可多選）</label>
+          <div id="correctPlayers" class="tags" style="margin-top:8px;"></div>
+          <button class="primary-btn" onclick="nextQuestion()" style="margin-top:16px;">下一題</button>
+        </div>
 
-  <!-- 問題列表 -->
-  <div id="questionList" style="margin-top: 24px;"></div>
-</div>
+        <button onclick="endQuiz()" style="background:#fee2e2; color:#ef4444; margin-top:12px;">結束本場</button>
+      </div>
 
-<!-- 問問題模式 -->
-<div id="quiz" class="mode">
-  <button class="back-btn" onclick="showMode('home')">← 回到首頁</button>
-  <h2>❓ 問問題</h2>
-
-<!-- 階段一：輸入玩家 + 選擇 Tag -->
-<div id="quiz-setup">
-  <div class="card">
-<label>玩家名稱</label>
-<div style="display: flex; gap: 8px;">
-  <input type="text"
-         id="playerInput"
-         list="savedPlayerOptions"
-         placeholder="輸入或選擇玩家名稱"
-         style="flex: 1;"
-         onkeydown="handlePlayerInput(event)">
-
-  <datalist id="savedPlayerOptions"></datalist>
-
-  <button onclick="addPlayer()" style="width: auto; padding: 0 16px; margin: 0;">
-    新增
-  </button>
-</div>
-
-<label style="margin-top:16px;">已儲存玩家（按一下加入本場）</label>
-<div id="savedPlayerList" class="tags" style="margin-top: 8px;"></div>
-
-<label style="margin-top:16px;">本場玩家</label>
-<div id="playerList" class="tags" style="margin-top: 8px;"></div>
-
-  </div>
-
-  <div class="card">
-    <label>選擇題目分類（可多選，不選 = 全部）</label>
-    <div id="tagFilterList" class="tags" style="margin-top: 10px;"></div>
-  </div>
-
-  <button class="primary-btn" onclick="startQuiz()">
-    開始問答
-  </button>
-</div>
-
-  <!-- 階段二：進行中的問答 -->
-  <div id="quiz-play" style="display: none;">
-    <div class="card" style="text-align: center;">
-      <div id="currentQuestion" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; min-height: 60px;"></div>
-      
-      <div id="currentAnswer" style="display: none; background: #f3e8ff; border-radius: 14px; padding: 14px; margin-bottom: 16px; color: #6b5b95;"></div>
-
-      <button id="toggleAnswerBtn" onclick="toggleAnswer()" class="primary-btn">
-        顯示答案
-      </button>
+      <div id="quiz-result" style="display:none;">
+        <div class="card">
+          <h3 style="text-align:center; margin-bottom:16px;">本場分數</h3>
+          <div id="scoreBoard"></div>
+          <button class="primary-btn" onclick="backToSetup()" style="margin-top:20px;">再來一場</button>
+        </div>
+      </div>
     </div>
 
-    <!-- 標記誰答對 -->
-    <div class="card" style="margin-top: 16px;">
-      <label>誰答對了？（可多選）</label>
-      <div id="correctPlayers" class="tags" style="margin-top: 8px;"></div>
-
-      <button class="primary-btn" onclick="nextQuestion()" style="margin-top: 16px;">
-        下一題
-      </button>
+    <!-- 編輯問題 Modal -->
+    <div id="editQuestionModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(74,63,107,0.45); padding:20px; align-items:center; justify-content:center;">
+      <div style="background:white; width:min(500px,100%); max-height:90vh; overflow-y:auto; border-radius:24px; padding:24px; box-shadow:0 10px 40px rgba(74,63,107,0.3);">
+        <h2 style="margin-bottom:18px;">✏️ 編輯問題</h2>
+        <label>問題</label>
+        <textarea id="editQuestionInput" rows="3" placeholder="請輸入問題..."></textarea>
+        <label>答案</label>
+        <textarea id="editAnswerInput" rows="2" placeholder="請輸入答案..."></textarea>
+        <label>分類 Tag（用逗號分隔）</label>
+        <input type="text" id="editTagsInput" placeholder="例如：歷史, 動漫, 科學">
+        <div class="btn-row" style="margin-top:20px;">
+          <button onclick="closeEditQuestionModal()" style="background:#f3e8ff; color:#7c3aed;">取消</button>
+          <button class="primary-btn" onclick="saveEditedQuestion()">儲存修改</button>
+        </div>
+      </div>
     </div>
 
-    <button onclick="endQuiz()" style="background: #fee2e2; color: #ef4444; margin-top: 12px;">
-      結束本場
-    </button>
-  </div>
-
-  <!-- 階段三：結束結算 -->
-  <div id="quiz-result" style="display: none;">
-    <div class="card">
-      <h3 style="text-align: center; margin-bottom: 16px;">本場分數</h3>
-      <div id="scoreBoard"></div>
-      <button class="primary-btn" onclick="backToSetup()" style="margin-top: 20px;">
-        再來一場
-      </button>
-    </div>
-  </div>
-</div>
-<!-- 編輯題目視窗 -->
-<div id="editQuestionModal"
-     style="display:none; position:fixed; inset:0; z-index:100;
-            background:rgba(74,63,107,0.45); padding:20px;
-            align-items:center; justify-content:center;">
-
-  <div style="background:white; width:min(500px, 100%); max-height:90vh;
-              overflow-y:auto; border-radius:24px; padding:24px;
-              box-shadow:0 10px 40px rgba(74,63,107,0.3);">
-
-    <h2 style="margin-bottom:18px;">✏️ 編輯問題</h2>
-
-    <label>問題</label>
-    <textarea id="editQuestionInput" rows="3" placeholder="請輸入問題..."></textarea>
-
-    <label>答案</label>
-    <textarea id="editAnswerInput" rows="2" placeholder="請輸入答案..."></textarea>
-
-    <label>分類 Tag（用逗號分隔）</label>
-    <input type="text" id="editTagsInput" placeholder="例如：歷史, 動漫, 科學">
-
-    <div class="btn-row" style="margin-top:20px;">
-      <button onclick="closeEditQuestionModal()" style="background:#f3e8ff; color:#7c3aed;">
-        取消
-      </button>
-      <button class="primary-btn" onclick="saveEditedQuestion()">
-        儲存修改
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Tag 管理視窗 -->
-<div id="tagManagerModal"
-     style="display:none; position:fixed; inset:0; z-index:100;
-            background:rgba(74,63,107,0.45); padding:20px;
-            align-items:center; justify-content:center;">
-
-  <div style="background:white; width:min(500px, 100%); max-height:90vh;
-              overflow-y:auto; border-radius:24px; padding:24px;
-              box-shadow:0 10px 40px rgba(74,63,107,0.3);">
-
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-      <h2 style="margin:0;">🏷️ 管理 Tag</h2>
-      <button onclick="closeTagManager()"
-              style="width:36px; height:36px; padding:0; margin:0;
-                     background:#f3e8ff; color:#7c3aed;">
-        ✕
-      </button>
+    <!-- Tag 管理 Modal -->
+    <div id="tagManagerModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(74,63,107,0.45); padding:20px; align-items:center; justify-content:center;">
+      <div style="background:white; width:min(500px,100%); max-height:90vh; overflow-y:auto; border-radius:24px; padding:24px; box-shadow:0 10px 40px rgba(74,63,107,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+          <h2 style="margin:0;">🏷️ 管理 Tag</h2>
+          <button onclick="closeTagManager()" style="width:36px; height:36px; padding:0; margin:0; background:#f3e8ff; color:#7c3aed;">✕</button>
+        </div>
+        <p style="font-size:14px; color:#7c6b9b; margin:14px 0 18px;">你可以重新命名 Tag，或從所有題目中移除不再需要的 Tag。</p>
+        <div id="tagManagerList"></div>
+      </div>
     </div>
 
-    <p style="font-size:14px; color:#7c6b9b; margin:14px 0 18px;">
-      你可以重新命名 Tag，或從所有題目中移除不再需要的 Tag。
-    </p>
-
-    <div id="tagManagerList"></div>
+    <!-- 貼上 CSV Modal -->
+    <div id="pasteCSVModal" style="display:none; position:fixed; inset:0; z-index:100; background:rgba(74,63,107,0.45); padding:20px; align-items:center; justify-content:center;">
+      <div style="background:white; width:min(520px,100%); max-height:90vh; overflow-y:auto; border-radius:24px; padding:24px; box-shadow:0 10px 40px rgba(74,63,107,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;">
+          <h2 style="margin:0;">📋 貼上 CSV 文字</h2>
+          <button onclick="closePasteCSV()" style="width:36px; height:36px; padding:0; margin:0; background:#f3e8ff; color:#7c3aed;">✕</button>
+        </div>
+        <p style="font-size:14px; color:#7c6b9b; margin-bottom:14px; line-height:1.5;">
+          直接將 CSV 內容貼上呢度（包含標題列）。<br>
+          支援問題／答案入面有換行（只要有用雙引號包住）。
+        </p>
+        <textarea id="pasteCSVInput" rows="12" placeholder="id,question,answer,tags
+1,太陽系有幾大行星？,八大行星,科學
+2,&quot;這題有
+換行&quot;,答案,測試"></textarea>
+        <div class="btn-row" style="margin-top:18px;">
+          <button onclick="closePasteCSV()" style="background:#f3e8ff; color:#7c3aed;">取消</button>
+          <button class="primary-btn" onclick="importPastedCSV()">開始匯入</button>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
 
 <script>
-  // ========== 資料 ==========
-  let selectedTags = [];   // 目前選中的 Tag
-  let questions = JSON.parse(localStorage.getItem('questions')) || [];
-  let heardRecords = JSON.parse(localStorage.getItem('heardRecords')) || [];
-  let players = [];
-// 曾經輸入過的玩家名稱，會儲存在瀏覽器 localStorage
-  let savedPlayers = JSON.parse(localStorage.getItem('savedPlayers')) || [];
-  let currentQuestion = null;
-  let sessionScores = {};
-  let currentCorrect = [];
+// ========== 資料 ==========
+let questions = JSON.parse(localStorage.getItem('questions')) || [];
+let heardRecords = JSON.parse(localStorage.getItem('heardRecords')) || [];
+let savedPlayers = JSON.parse(localStorage.getItem('savedPlayers')) || [];
+let players = [];
+let selectedTags = [];
+let writeSearchQuery = '';
+let writeSelectedTags = [];
+let currentQuestion = null;
+let sessionScores = {};
+let currentCorrect = [];
 let editingQuestionId = null;
 
-  // 儲存題目
-  function saveQuestions() {
-    localStorage.setItem('questions', JSON.stringify(questions));
-  }
-
-  // ========== 模式切換 ==========
-function showMode(mode) {
-  document.getElementById('home').style.display = 'none';
-  document.getElementById('write').classList.remove('active');
-  document.getElementById('quiz').classList.remove('active');
-
-  if (mode === 'home') {
-    document.getElementById('home').style.display = 'block';
-  } else {
-    document.getElementById(mode).classList.add('active');
-if (mode === 'write') {
-  renderQuestionList();
-  renderExistingTagSuggestions();
+// ========== 工具函數 ==========
+function saveQuestions() {
+  localStorage.setItem('questions', JSON.stringify(questions));
 }
-if (mode === 'quiz') {
-  renderTagFilter();
-  renderSavedPlayers();
-  renderPlayerList();
 
-  // 重置畫面狀態
-  document.getElementById('quiz-setup').style.display = 'block';
-  document.getElementById('quiz-play').style.display = 'none';
-  document.getElementById('quiz-result').style.display = 'none';
+function savePlayers() {
+  localStorage.setItem('savedPlayers', JSON.stringify(savedPlayers));
 }
-  }
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = String(text ?? '');
+  return div.innerHTML;
 }
-// 將 Tag 文字轉換為乾淨、沒有重複的 Tag 陣列
+
 function normalizeTags(tagsText) {
   if (!tagsText) return [];
-
   const tags = tagsText
-    .split(',')
-    .map(tag => tag.trim())              // 移除前後空格
-    .map(tag => tag.replace(/\s+/g, ' ')) // 多個空格合併為一個
-    .filter(tag => tag);                 // 移除空白項目
-
-  // 同一題中，移除重複 Tag
+    .split(/[,，、]/)
+    .map(tag => tag.trim().replace(/\s+/g, ' '))
+    .filter(Boolean);
   return [...new Set(tags)];
 }
 
-// 取得題庫內全部 Tag，依名稱排序
 function getAllTags() {
-  return [...new Set(
-    questions.flatMap(question => question.tags || [])
-  )].sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+  return [...new Set(questions.flatMap(q => q.tags || []))]
+    .sort((a, b) => a.localeCompare(b, 'zh-Hant'));
 }
 
-// 避免題目、答案或 Tag 中的特殊字元影響 HTML
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = String(text);
-  return div.innerHTML;
+function getDateString() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
-  // ========== 寫問題模式 ==========
+
+// ========== 模式切換 ==========
+function showMode(mode) {
+  document.getElementById('home').style.display = 'none';
+  ['write', 'manage', 'quiz'].forEach(id => {
+    document.getElementById(id).classList.remove('active');
+  });
+
+  if (mode === 'home') {
+    document.getElementById('home').style.display = 'block';
+    return;
+  }
+
+  document.getElementById(mode).classList.add('active');
+
+  if (mode === 'manage') {
+    renderWriteTagFilter();
+    renderQuestionList();
+  } else if (mode === 'write') {
+    renderExistingTagSuggestions();
+  } else if (mode === 'quiz') {
+    renderTagFilter();
+    renderSavedPlayers();
+    renderPlayerList();
+    document.getElementById('quiz-setup').style.display = 'block';
+    document.getElementById('quiz-play').style.display = 'none';
+    document.getElementById('quiz-result').style.display = 'none';
+  }
+}
+
+// ========== 題庫管理 ==========
 function addQuestion() {
   const question = document.getElementById('questionInput').value.trim();
   const answer = document.getElementById('answerInput').value.trim();
@@ -834,102 +600,52 @@ function addQuestion() {
     return;
   }
 
-  const tags = normalizeTags(tagsText);
-
   questions.push({
     id: Date.now(),
     question,
     answer,
-    tags
+    tags: normalizeTags(tagsText)
   });
 
   saveQuestions();
 
-document.getElementById('questionInput').value = '';
-document.getElementById('answerInput').value = '';
-document.getElementById('tagsInput').value = '';
+  document.getElementById('questionInput').value = '';
+  document.getElementById('answerInput').value = '';
+  document.getElementById('tagsInput').value = '';
+  if (document.activeElement) document.activeElement.blur();
 
-// 收起手機鍵盤，避免 Safari 保持輸入框的縮放狀態
-if (document.activeElement) {
-  document.activeElement.blur();
+  showMode('manage');
+  alert('問題已新增！');
 }
 
+function deleteQuestion(id) {
+  if (!confirm('確定要刪除這題嗎？')) return;
+  questions = questions.filter(q => q.id !== id);
+  saveQuestions();
   renderQuestionList();
-  renderExistingTagSuggestions();
+  renderWriteTagFilter();
 }
-function renderQuestionList() {
-  const listEl = document.getElementById('questionList');
 
-  if (questions.length === 0) {
-    listEl.innerHTML =
-      '<p style="text-align:center; color:#9ca3af;">目前還沒有問題，快來新增吧！</p>';
-    return;
-  }
-
-  listEl.innerHTML = questions.map(q => `
-    <div class="question-item">
-      <button class="delete-btn"
-              title="刪除問題"
-              onclick="deleteQuestion(${q.id})">
-        ✕
-      </button>
-
-      <button
-        title="編輯問題"
-        onclick="openEditQuestionModal(${q.id})"
-        style="
-          position:absolute;
-          top:12px;
-          right:52px;
-          width:32px;
-          height:32px;
-          padding:0;
-          margin:0;
-          background:#e9d5ff;
-          color:#7c3aed;
-          font-size:14px;
-          box-shadow:none;">
-        ✏️
-      </button>
-
-      <div class="q-text">${escapeHtml(q.question)}</div>
-      <div class="a-text">答案：${escapeHtml(q.answer)}</div>
-
-      <div class="tags">
-        ${(q.tags || []).map(tag =>
-          `<span class="tag">${escapeHtml(tag)}</span>`
-        ).join('')}
-      </div>
-    </div>
-  `).join('');
-}
-  function deleteQuestion(id) {
-    if (!confirm('確定要刪除這題嗎？')) return;
-    questions = questions.filter(q => q.id !== id);
-    saveQuestions();
-    renderQuestionList();
-  }
 function openEditQuestionModal(id) {
   const question = questions.find(q => q.id === id);
-
   if (!question) {
     alert('找不到這條題目');
     return;
   }
 
   editingQuestionId = id;
-
   document.getElementById('editQuestionInput').value = question.question;
   document.getElementById('editAnswerInput').value = question.answer;
   document.getElementById('editTagsInput').value = (question.tags || []).join(', ');
 
-  const modal = document.getElementById('editQuestionModal');
-  modal.style.display = 'flex';
+  document.getElementById('editQuestionModal').style.display = 'flex';
+  document.body.classList.add('modal-open');
 }
 
 function closeEditQuestionModal() {
   editingQuestionId = null;
   document.getElementById('editQuestionModal').style.display = 'none';
+  document.body.classList.remove('modal-open');
 }
 
 function saveEditedQuestion() {
@@ -944,57 +660,144 @@ function saveEditedQuestion() {
     return;
   }
 
-  const questionIndex = questions.findIndex(q => q.id === editingQuestionId);
-
-  if (questionIndex === -1) {
+  const index = questions.findIndex(q => q.id === editingQuestionId);
+  if (index === -1) {
     alert('找不到這條題目');
     closeEditQuestionModal();
     return;
   }
 
-  questions[questionIndex] = {
-    ...questions[questionIndex],
+  questions[index] = {
+    ...questions[index],
     question: questionText,
     answer: answerText,
     tags: normalizeTags(tagsText),
     updatedAt: Date.now()
   };
 
-saveQuestions();
-
-if (document.activeElement) {
-  document.activeElement.blur();
-}
-
-closeEditQuestionModal();
+  saveQuestions();
+  if (document.activeElement) document.activeElement.blur();
+  closeEditQuestionModal();
 
   renderQuestionList();
+  renderWriteTagFilter();
   renderExistingTagSuggestions();
 
-  // 如果 Tag 管理視窗正開啟，同時更新它
   if (document.getElementById('tagManagerModal').style.display === 'flex') {
     renderTagManager();
   }
 
   alert('題目已更新！');
 }
-function renderExistingTagSuggestions() {
-  const el = document.getElementById('existingTagSuggestions');
 
+function onWriteSearchInput() {
+  const input = document.getElementById('writeSearchInput');
+  writeSearchQuery = input ? input.value.trim().toLowerCase() : '';
+  renderQuestionList();
+}
+
+function renderWriteTagFilter() {
+  const el = document.getElementById('writeTagFilterList');
   if (!el) return;
 
   const allTags = getAllTags();
-
   if (allTags.length === 0) {
-    el.innerHTML =
-      '<span style="color:#9ca3af; font-size:13px;">目前還沒有 Tag</span>';
+    el.innerHTML = '<span style="color:#9ca3af; font-size:13px;">目前還沒有 Tag</span>';
+    return;
+  }
+
+  el.innerHTML = allTags.map((tag, index) => {
+    const isSelected = writeSelectedTags.includes(tag);
+    return `
+      <span class="tag"
+            style="cursor:pointer; background:${isSelected ? '#c4b5fd' : '#f3e8ff'}; color:${isSelected ? 'white' : '#7c3aed'};"
+            onclick="toggleWriteTag(${index})">
+        ${escapeHtml(tag)}
+      </span>`;
+  }).join('');
+}
+
+function toggleWriteTag(index) {
+  const allTags = getAllTags();
+  const tag = allTags[index];
+  if (!tag) return;
+
+  if (writeSelectedTags.includes(tag)) {
+    writeSelectedTags = writeSelectedTags.filter(t => t !== tag);
+  } else {
+    writeSelectedTags.push(tag);
+  }
+  renderWriteTagFilter();
+  renderQuestionList();
+}
+
+function renderQuestionList() {
+  const listEl = document.getElementById('questionList');
+  const countBar = document.getElementById('questionCountBar');
+  if (!listEl) return;
+
+  let filtered = questions;
+
+  if (writeSelectedTags.length > 0) {
+    filtered = filtered.filter(q => (q.tags || []).some(tag => writeSelectedTags.includes(tag)));
+  }
+
+  if (writeSearchQuery) {
+    filtered = filtered.filter(q => {
+      const qText = (q.question || '').toLowerCase();
+      const aText = (q.answer || '').toLowerCase();
+      return qText.includes(writeSearchQuery) || aText.includes(writeSearchQuery);
+    });
+  }
+
+  if (countBar) {
+    if (questions.length === 0) {
+      countBar.textContent = '';
+    } else if (filtered.length === questions.length) {
+      countBar.textContent = `目前共有 ${questions.length} 題`;
+    } else {
+      countBar.textContent = `顯示 ${filtered.length} / 共 ${questions.length} 題`;
+    }
+  }
+
+  if (questions.length === 0) {
+    listEl.innerHTML = '<p style="text-align:center; color:#9ca3af;">目前還沒有問題，快來新增吧！</p>';
+    return;
+  }
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<p style="text-align:center; color:#9ca3af;">沒有符合條件的問題</p>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(q => `
+    <div class="question-item">
+      <button class="delete-btn" title="刪除問題" onclick="deleteQuestion(${q.id})">✕</button>
+      <button title="編輯問題" onclick="openEditQuestionModal(${q.id})"
+              style="position:absolute; top:12px; right:52px; width:32px; height:32px; padding:0; margin:0; background:#e9d5ff; color:#7c3aed; font-size:14px; box-shadow:none;">
+        ✏️
+      </button>
+      <div class="q-text">${escapeHtml(q.question)}</div>
+      <div class="a-text">答案：${escapeHtml(q.answer)}</div>
+      <div class="tags">
+        ${(q.tags || []).map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderExistingTagSuggestions() {
+  const el = document.getElementById('existingTagSuggestions');
+  if (!el) return;
+
+  const allTags = getAllTags();
+  if (allTags.length === 0) {
+    el.innerHTML = '<span style="color:#9ca3af; font-size:13px;">目前還沒有 Tag</span>';
     return;
   }
 
   el.innerHTML = allTags.map((tag, index) => `
-    <span class="tag"
-          style="cursor:pointer"
-          onclick="appendTagToInput(${index})">
+    <span class="tag" style="cursor:pointer" onclick="appendTagToInput(${index})">
       + ${escapeHtml(tag)}
     </span>
   `).join('');
@@ -1003,620 +806,22 @@ function renderExistingTagSuggestions() {
 function appendTagToInput(index) {
   const allTags = getAllTags();
   const tag = allTags[index];
-
   if (!tag) return;
 
   const input = document.getElementById('tagsInput');
-  const existingTags = normalizeTags(input.value);
+  const existing = normalizeTags(input.value);
 
-  if (existingTags.includes(tag)) {
+  if (existing.includes(tag)) {
     alert(`「${tag}」已經加入這題`);
     return;
   }
 
-  existingTags.push(tag);
-  input.value = existingTags.join(', ');
+  existing.push(tag);
+  input.value = existing.join(', ');
   input.focus();
 }
 
-// 儲存已使用過的玩家名稱
-function savePlayers() {
-  localStorage.setItem('savedPlayers', JSON.stringify(savedPlayers));
-}
-
-// 將玩家名稱安全地顯示在 HTML 中
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
-}
-
-// 讓玩家可以按 Enter 新增
-function handlePlayerInput(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    addPlayer();
-  }
-}
-
-// 顯示輸入框的自動完成選項，以及「已儲存玩家」按鈕
-function renderSavedPlayers() {
-  const datalist = document.getElementById('savedPlayerOptions');
-  const savedPlayerList = document.getElementById('savedPlayerList');
-
-  // 輸入欄自動完成選項
-  datalist.innerHTML = savedPlayers
-    .map(name => `<option value="${escapeHtml(name)}"></option>`)
-    .join('');
-
-  // 已儲存玩家快速選擇按鈕
-  if (savedPlayers.length === 0) {
-    savedPlayerList.innerHTML =
-      '<span style="color:#9ca3af; font-size:14px;">尚未儲存任何玩家</span>';
-    return;
-  }
-
-  savedPlayerList.innerHTML = savedPlayers.map((name, index) => `
-    <span class="tag"
-          style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;"
-          onclick="addSavedPlayer(${index})">
-      ${escapeHtml(name)}
-      <button
-        type="button"
-        title="刪除此已儲存玩家"
-        onclick="event.stopPropagation(); deleteSavedPlayer(${index})"
-        style="
-          width:auto;
-          min-width:18px;
-          height:18px;
-          padding:0;
-          margin:0;
-          font-size:12px;
-          line-height:18px;
-          color:#7c3aed;
-          background:transparent;
-          box-shadow:none;
-          border:none;">
-        ✕
-      </button>
-    </span>
-  `).join('');
-}
-
-// 從已儲存玩家清單加入本場
-function addSavedPlayer(index) {
-  const name = savedPlayers[index];
-
-  if (!name) return;
-
-  if (players.includes(name)) {
-    alert('這個玩家已經加入本場');
-    return;
-  }
-
-  players.push(name);
-  renderPlayerList();
-}
-
-// 刪除已儲存玩家
-function deleteSavedPlayer(index) {
-  const name = savedPlayers[index];
-
-  if (!confirm(`確定要刪除已儲存玩家「${name}」嗎？`)) {
-    return;
-  }
-
-  savedPlayers.splice(index, 1);
-  savePlayers();
-  renderSavedPlayers();
-}
-
-  // ========== 問問題模式 ==========
-function addPlayer() {
-  const input = document.getElementById('playerInput');
-  const name = input.value.trim();
-
-  if (!name) {
-    alert('請輸入玩家名稱');
-    return;
-  }
-
-  if (players.includes(name)) {
-    alert('這個玩家已經加入本場');
-    return;
-  }
-
-  // 加入本場玩家
-  players.push(name);
-
-  // 如果這是新名稱，加入長期儲存的玩家名單
-  if (!savedPlayers.includes(name)) {
-    savedPlayers.push(name);
-
-    // 依中文／英文名稱排序，方便日後查找
-    savedPlayers.sort((a, b) =>
-      a.localeCompare(b, 'zh-Hant')
-    );
-
-    savePlayers();
-  }
-
-  input.value = '';
-  renderPlayerList();
-  renderSavedPlayers();
-}
-
-function renderPlayerList() {
-  const el = document.getElementById('playerList');
-
-  if (players.length === 0) {
-    el.innerHTML =
-      '<span style="color:#9ca3af; font-size:14px;">尚未加入本場玩家</span>';
-    return;
-  }
-
-  el.innerHTML = players.map((name, index) => `
-    <span class="tag"
-          style="cursor:pointer"
-          onclick="removePlayer(${index})">
-      ${escapeHtml(name)} ✕
-    </span>
-  `).join('');
-}
-
-function removePlayer(index) {
-  players.splice(index, 1);
-  renderPlayerList();
-}
-
-
-  function startQuiz() {
-    if (players.length === 0) {
-      alert('請至少加入一位玩家');
-      return;
-    }
-// 根據選中的 Tag 過濾題目
-const filteredQuestions = selectedTags.length === 0
-  ? questions
-  : questions.filter(q => q.tags.some(tag => selectedTags.includes(tag)));
-
-if (filteredQuestions.length === 0) {
-  alert(selectedTags.length === 0 
-    ? '目前沒有任何問題，請先去寫問題模式新增！' 
-    : '選擇的分類目前沒有題目，請換個分類或新增題目');
-  return;
-}
-    sessionScores = {};
-    players.forEach(p => sessionScores[p] = 0);
-    currentCorrect = [];
-
-    document.getElementById('quiz-setup').style.display = 'none';
-    document.getElementById('quiz-play').style.display = 'block';
-    document.getElementById('quiz-result').style.display = 'none';
-
-    nextQuestion(true);
-  }
-
-  function nextQuestion(isFirst = false) {
-    if (!isFirst && currentQuestion) {
-      // 自動記錄本場所有玩家都聽過
-      players.forEach(playerName => {
-        const already = heardRecords.some(r => 
-          r.questionId === currentQuestion.id && r.playerName === playerName
-        );
-        if (!already) {
-          heardRecords.push({
-            questionId: currentQuestion.id,
-            playerName: playerName,
-            heardAt: Date.now()
-          });
-        }
-      });
-      localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
-
-      // 加分
-      currentCorrect.forEach(name => {
-        if (sessionScores[name] !== undefined) {
-          sessionScores[name] += 1;
-        }
-      });
-    }
-
-const baseQuestions = selectedTags.length === 0
-  ? questions
-  : questions.filter(q => q.tags.some(tag => selectedTags.includes(tag)));
-
-const available = baseQuestions.filter(q => {
-      const heardBy = heardRecords
-        .filter(r => r.questionId === q.id)
-        .map(r => r.playerName);
-      return players.every(p => !heardBy.includes(p));
-    });
-
-    if (available.length === 0) {
-      alert('所有玩家都已經聽過目前能出的題目了！');
-      endQuiz();
-      return;
-    }
-
-    currentQuestion = available[Math.floor(Math.random() * available.length)];
-    currentCorrect = [];
-
-    document.getElementById('currentQuestion').textContent = currentQuestion.question;
-    document.getElementById('currentAnswer').style.display = 'none';
-    document.getElementById('currentAnswer').textContent = '答案：' + currentQuestion.answer;
-    document.getElementById('toggleAnswerBtn').textContent = '顯示答案';
-
-    renderCorrectPlayers();
-  }
-
-  function toggleAnswer() {
-    const answerEl = document.getElementById('currentAnswer');
-    const btn = document.getElementById('toggleAnswerBtn');
-    if (answerEl.style.display === 'none') {
-      answerEl.style.display = 'block';
-      btn.textContent = '隱藏答案';
-    } else {
-      answerEl.style.display = 'none';
-      btn.textContent = '顯示答案';
-    }
-  }
-
-  function renderCorrectPlayers() {
-    const el = document.getElementById('correctPlayers');
-    el.innerHTML = players.map(name => {
-      const isChecked = currentCorrect.includes(name);
-      return `
-        <label style="display:inline-flex; align-items:center; gap:6px; 
-                      background:${isChecked ? '#c4b5fd' : '#f3e8ff'}; 
-                      color:${isChecked ? 'white' : '#7c3aed'};
-                      padding:8px 12px; border-radius:999px; cursor:pointer; margin:4px;">
-          <input type="checkbox" ${isChecked ? 'checked' : ''} 
-                 onchange="toggleCorrect('${name}', this.checked)">
-          ${name}
-        </label>
-      `;
-    }).join('');
-  }
-
-  function toggleCorrect(playerName, isChecked) {
-    if (isChecked) {
-      if (!currentCorrect.includes(playerName)) currentCorrect.push(playerName);
-    } else {
-      currentCorrect = currentCorrect.filter(n => n !== playerName);
-    }
-    renderCorrectPlayers();
-  }
-
-  function endQuiz() {
-    if (currentQuestion) {
-      players.forEach(playerName => {
-        const already = heardRecords.some(r => 
-          r.questionId === currentQuestion.id && r.playerName === playerName
-        );
-        if (!already) {
-          heardRecords.push({
-            questionId: currentQuestion.id,
-            playerName: playerName,
-            heardAt: Date.now()
-          });
-        }
-      });
-      localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
-
-      currentCorrect.forEach(name => {
-        if (sessionScores[name] !== undefined) {
-          sessionScores[name] += 1;
-        }
-      });
-    }
-
-    document.getElementById('quiz-play').style.display = 'none';
-    document.getElementById('quiz-result').style.display = 'block';
-
-    const board = document.getElementById('scoreBoard');
-    const sorted = Object.entries(sessionScores).sort((a, b) => b[1] - a[1]);
-
-    board.innerHTML = sorted.map(([name, score], index) => `
-      <div style="display:flex; justify-content:space-between; align-items:center; 
-                  padding:12px 0; border-bottom:1px solid #f3e8ff;">
-        <span>${index + 1}. ${name}</span>
-        <span style="font-weight:700; color:#7c3aed;">${score} 分</span>
-      </div>
-    `).join('');
-  }
-
-function backToSetup() {
-  document.getElementById('quiz-result').style.display = 'none';
-  document.getElementById('quiz-setup').style.display = 'block';
-
-  // 新一場開始時清空「本場玩家」
-  // 但 savedPlayers 會保留在 localStorage 內
-  players = [];
-
-  renderPlayerList();
-  renderSavedPlayers();
-}
-
-// 渲染可選的 Tag
-function renderTagFilter() {
-  const el = document.getElementById('tagFilterList');
-  
-  // 收集所有出現過的 Tag
-const allTags = getAllTags();
-  
-  if (allTags.length === 0) {
-    el.innerHTML = '<span style="color:#9ca3af; font-size:14px;">目前沒有任何 Tag</span>';
-    return;
-  }
-
-  el.innerHTML = allTags.map(tag => {
-    const isSelected = selectedTags.includes(tag);
-    return `
-      <span class="tag" 
-            style="cursor:pointer; background:${isSelected ? '#c4b5fd' : '#f3e8ff'}; 
-                   color:${isSelected ? 'white' : '#7c3aed'};"
-            onclick="toggleTag('${tag}')">
-        ${tag}
-      </span>
-    `;
-  }).join('');
-}
-
-// 切換 Tag 選取狀態
-function toggleTag(tag) {
-  if (selectedTags.includes(tag)) {
-    selectedTags = selectedTags.filter(t => t !== tag);
-  } else {
-    selectedTags.push(tag);
-  }
-  renderTagFilter();
-}
-// ========== CSV 工具函式 ==========
-
-// 將文字轉換成安全的 CSV 格式
-function escapeCSV(value) {
-  const text = String(value ?? '');
-
-  // CSV 內含逗號、雙引號或換行時，需要用雙引號包住
-  if (
-    text.includes(',') ||
-    text.includes('"') ||
-    text.includes('\n') ||
-    text.includes('\r')
-  ) {
-    return `"${text.replace(/"/g, '""')}"`;
-  }
-
-  return text;
-}
-
-// 匯出題庫為 CSV
-function exportCSV() {
-  if (questions.length === 0) {
-    alert('目前沒有任何題目可以匯出');
-    return;
-  }
-
-  const headers = ['id', 'question', 'answer', 'tags'];
-
-  const rows = questions.map(q => [
-    q.id,
-    q.question,
-    q.answer,
-    (q.tags || []).join('、')
-  ]);
-
-  const csvContent = [
-    headers,
-    ...rows
-  ]
-    .map(row => row.map(escapeCSV).join(','))
-    .join('\r\n');
-
-  // 加入 UTF-8 BOM，避免 Excel 開啟中文時出現亂碼
-  const blob = new Blob(
-    ['\uFEFF' + csvContent],
-    { type: 'text/csv;charset=utf-8;' }
-  );
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-
-  link.href = url;
-  link.download = `題庫_${getDateString()}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  URL.revokeObjectURL(url);
-
-  alert('CSV 題庫已匯出！');
-}
-
-function getDateString() {
-  const now = new Date();
-
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-
-  return `${year}-${month}-${day}`;
-}
-
-// 解析 CSV，支援逗號、雙引號及換行
-function parseCSV(csvText) {
-  const rows = [];
-  let row = [];
-  let cell = '';
-  let insideQuotes = false;
-
-  for (let i = 0; i < csvText.length; i++) {
-    const char = csvText[i];
-    const nextChar = csvText[i + 1];
-
-    if (char === '"' && insideQuotes && nextChar === '"') {
-      // CSV 中的 "" 代表一個雙引號
-      cell += '"';
-      i++;
-    } else if (char === '"') {
-      insideQuotes = !insideQuotes;
-    } else if (char === ',' && !insideQuotes) {
-      row.push(cell);
-      cell = '';
-    } else if (
-      (char === '\n' || char === '\r') &&
-      !insideQuotes
-    ) {
-      // 處理 Windows 的 \r\n
-      if (char === '\r' && nextChar === '\n') {
-        i++;
-      }
-
-      row.push(cell);
-      cell = '';
-
-      // 避免檔案最後多出空白列
-      if (row.some(value => value.trim() !== '')) {
-        rows.push(row);
-      }
-
-      row = [];
-    } else {
-      cell += char;
-    }
-  }
-
-  // 處理最後一格
-  if (cell.length > 0 || row.length > 0) {
-    row.push(cell);
-
-    if (row.some(value => value.trim() !== '')) {
-      rows.push(row);
-    }
-  }
-
-  return rows;
-}
-
-
-// ========== 匯入題庫 ==========
-function importCSV(event) {
-  const file = event.target.files[0];
-
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    try {
-      let csvText = e.target.result;
-
-      // 移除 UTF-8 BOM
-      csvText = csvText.replace(/^\uFEFF/, '');
-
-      const rows = parseCSV(csvText);
-
-      if (rows.length < 2) {
-        alert('CSV 檔案沒有有效題目資料');
-        return;
-      }
-
-      const headers = rows[0].map(header =>
-        header.trim().toLowerCase()
-      );
-
-      const questionIndex = headers.indexOf('question');
-      const answerIndex = headers.indexOf('answer');
-      const tagsIndex = headers.indexOf('tags');
-      const idIndex = headers.indexOf('id');
-
-      if (questionIndex === -1 || answerIndex === -1) {
-        alert('CSV 格式錯誤：必須包含 question 和 answer 欄位');
-        return;
-      }
-
-      const importedQuestions = rows
-        .slice(1)
-        .map(row => {
-          const question = (row[questionIndex] || '').trim();
-          const answer = (row[answerIndex] || '').trim();
-          const tagsText = (row[tagsIndex] || '').trim();
-
-          if (!question || !answer) {
-            return null;
-          }
-
-          const tags = tagsText
-            ? tagsText
-                .split(/[、,]/)
-                .map(tag => tag.trim())
-                .filter(Boolean)
-            : [];
-
-          return {
-            id: idIndex !== -1 && row[idIndex]
-              ? Number(row[idIndex])
-              : Date.now() + Math.random(),
-
-            question,
-            answer,
-            tags: [...new Set(tags)]
-          };
-        })
-        .filter(Boolean);
-
-      if (importedQuestions.length === 0) {
-        alert('CSV 中沒有有效的題目');
-        return;
-      }
-
-      const shouldMerge = confirm(
-        `成功讀取 ${importedQuestions.length} 題。\n\n` +
-        `按「確定」合併到現有題庫。\n` +
-        `按「取消」覆蓋現有題庫。`
-      );
-
-      if (shouldMerge) {
-        const existingIds = new Set(questions.map(q => q.id));
-
-        const newQuestions = importedQuestions.filter(q =>
-          !existingIds.has(q.id)
-        );
-
-        questions = questions.concat(newQuestions);
-
-        alert(`成功合併 ${newQuestions.length} 題！`);
-      } else {
-        questions = importedQuestions;
-        alert(`已覆蓋為 ${questions.length} 題！`);
-      }
-
-      saveQuestions();
-
-      // 更新畫面
-      if (document.getElementById('write')?.classList.contains('active')) {
-        renderQuestionList();
-        renderExistingTagSuggestions();
-      }
-
-      if (typeof renderTagFilter === 'function') {
-        renderTagFilter();
-      }
-
-    } catch (error) {
-      console.error(error);
-      alert('CSV 讀取失敗，請確認檔案格式正確');
-    }
-  };
-
-  // 繁體中文 CSV 通常使用 UTF-8
-  reader.readAsText(file, 'UTF-8');
-
-  // 清空 input，讓同一個檔案可以再次選取
-  event.target.value = '';
-}
-
+// ========== Tag 管理 ==========
 function openTagManager() {
   document.getElementById('tagManagerModal').style.display = 'flex';
   renderTagManager();
@@ -1631,61 +836,21 @@ function renderTagManager() {
   const allTags = getAllTags();
 
   if (allTags.length === 0) {
-    el.innerHTML = `
-      <p style="text-align:center; color:#9ca3af;">
-        目前沒有任何 Tag。
-      </p>
-    `;
+    el.innerHTML = '<p style="text-align:center; color:#9ca3af;">目前沒有任何 Tag。</p>';
     return;
   }
 
   el.innerHTML = allTags.map((tag, index) => {
-    const questionCount = questions.filter(q =>
-      (q.tags || []).includes(tag)
-    ).length;
-
+    const count = questions.filter(q => (q.tags || []).includes(tag)).length;
     return `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:10px;
-        padding:12px 0;
-        border-bottom:1px solid #f3e8ff;">
-
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:1px solid #f3e8ff;">
         <div>
-          <div style="font-weight:700; color:#4a3f6b;">
-            ${escapeHtml(tag)}
-          </div>
-          <div style="font-size:12px; color:#7c6b9b; margin-top:3px;">
-            使用於 ${questionCount} 題
-          </div>
+          <div style="font-weight:700; color:#4a3f6b;">${escapeHtml(tag)}</div>
+          <div style="font-size:12px; color:#7c6b9b; margin-top:3px;">使用於 ${count} 題</div>
         </div>
-
         <div style="display:flex; gap:8px;">
-          <button
-            onclick="renameTag(${index})"
-            style="
-              width:auto;
-              margin:0;
-              padding:8px 11px;
-              background:#f3e8ff;
-              color:#7c3aed;
-              box-shadow:none;">
-            ✏️ 改名
-          </button>
-
-          <button
-            onclick="deleteTag(${index})"
-            style="
-              width:auto;
-              margin:0;
-              padding:8px 11px;
-              background:#fee2e2;
-              color:#ef4444;
-              box-shadow:none;">
-            ✕ 刪除
-          </button>
+          <button onclick="renameTag(${index})" style="width:auto; margin:0; padding:8px 11px; background:#f3e8ff; color:#7c3aed; box-shadow:none;">✏️ 改名</button>
+          <button onclick="deleteTag(${index})" style="width:auto; margin:0; padding:8px 11px; background:#fee2e2; color:#ef4444; box-shadow:none;">✕ 刪除</button>
         </div>
       </div>
     `;
@@ -1695,85 +860,589 @@ function renderTagManager() {
 function renameTag(index) {
   const allTags = getAllTags();
   const oldTag = allTags[index];
-
   if (!oldTag) return;
 
-  const newTagInput = prompt(`重新命名 Tag「${oldTag}」：`, oldTag);
+  const input = prompt(`重新命名 Tag「${oldTag}」：`, oldTag);
+  if (input === null) return;
 
-  if (newTagInput === null) return;
-
-  const newTag = newTagInput.trim().replace(/\s+/g, ' ');
-
+  const newTag = input.trim().replace(/\s+/g, ' ');
   if (!newTag) {
     alert('Tag 名稱不能為空白');
     return;
   }
-
   if (newTag === oldTag) return;
-
   if (allTags.includes(newTag)) {
-    alert(`Tag「${newTag}」已經存在。請先使用現有 Tag，或選擇其他名稱。`);
+    alert(`Tag「${newTag}」已經存在。`);
     return;
   }
 
-  questions = questions.map(question => ({
-    ...question,
-    tags: (question.tags || []).map(tag =>
-      tag === oldTag ? newTag : tag
-    )
+  questions = questions.map(q => ({
+    ...q,
+    tags: (q.tags || []).map(t => t === oldTag ? newTag : t)
   }));
-
-  // 如玩家正在選擇題目分類，亦同步更新選中的 Tag
-  selectedTags = selectedTags.map(tag =>
-    tag === oldTag ? newTag : tag
-  );
+  selectedTags = selectedTags.map(t => t === oldTag ? newTag : t);
+  writeSelectedTags = writeSelectedTags.map(t => t === oldTag ? newTag : t);
 
   saveQuestions();
-
   renderQuestionList();
+  renderWriteTagFilter();
   renderExistingTagSuggestions();
   renderTagFilter();
   renderTagManager();
-
   alert(`Tag 已由「${oldTag}」改為「${newTag}」`);
 }
 
 function deleteTag(index) {
   const allTags = getAllTags();
   const tagToDelete = allTags[index];
-
   if (!tagToDelete) return;
 
-  const questionCount = questions.filter(question =>
-    (question.tags || []).includes(tagToDelete)
-  ).length;
+  const count = questions.filter(q => (q.tags || []).includes(tagToDelete)).length;
+  if (!confirm(`確定要刪除 Tag「${tagToDelete}」嗎？\n\n它目前被 ${count} 條題目使用。\n刪除後，這個 Tag 會從所有題目中移除。`)) {
+    return;
+  }
 
-  const confirmed = confirm(
-    `確定要刪除 Tag「${tagToDelete}」嗎？\n\n` +
-    `它目前被 ${questionCount} 條題目使用。\n` +
-    `刪除後，這個 Tag 會從所有題目中移除。`
-  );
-
-  if (!confirmed) return;
-
-  questions = questions.map(question => ({
-    ...question,
-    tags: (question.tags || []).filter(tag => tag !== tagToDelete)
+  questions = questions.map(q => ({
+    ...q,
+    tags: (q.tags || []).filter(t => t !== tagToDelete)
   }));
-
-  // 同時從目前的篩選狀態移除
-  selectedTags = selectedTags.filter(tag => tag !== tagToDelete);
+  selectedTags = selectedTags.filter(t => t !== tagToDelete);
+  writeSelectedTags = writeSelectedTags.filter(t => t !== tagToDelete);
 
   saveQuestions();
-
   renderQuestionList();
+  renderWriteTagFilter();
   renderExistingTagSuggestions();
   renderTagFilter();
   renderTagManager();
-
   alert(`Tag「${tagToDelete}」已從所有題目中移除。`);
 }
 
+// ========== 玩家管理 ==========
+function handlePlayerInput(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    addPlayer();
+  }
+}
+
+function addPlayer() {
+  const input = document.getElementById('playerInput');
+  const name = input.value.trim();
+  if (!name) {
+    alert('請輸入玩家名稱');
+    return;
+  }
+  if (players.includes(name)) {
+    alert('這個玩家已經加入本場');
+    return;
+  }
+
+  players.push(name);
+
+  if (!savedPlayers.includes(name)) {
+    savedPlayers.push(name);
+    savedPlayers.sort((a, b) => a.localeCompare(b, 'zh-Hant'));
+    savePlayers();
+  }
+
+  input.value = '';
+  renderPlayerList();
+  renderSavedPlayers();
+}
+
+function removePlayer(index) {
+  players.splice(index, 1);
+  renderPlayerList();
+}
+
+function renderPlayerList() {
+  const el = document.getElementById('playerList');
+  if (players.length === 0) {
+    el.innerHTML = '<span style="color:#9ca3af; font-size:14px;">尚未加入本場玩家</span>';
+    return;
+  }
+  el.innerHTML = players.map((name, index) => `
+    <span class="tag" style="cursor:pointer" onclick="removePlayer(${index})">
+      ${escapeHtml(name)} ✕
+    </span>
+  `).join('');
+}
+
+function renderSavedPlayers() {
+  const datalist = document.getElementById('savedPlayerOptions');
+  const listEl = document.getElementById('savedPlayerList');
+
+  datalist.innerHTML = savedPlayers
+    .map(name => `<option value="${escapeHtml(name)}"></option>`)
+    .join('');
+
+  if (savedPlayers.length === 0) {
+    listEl.innerHTML = '<span style="color:#9ca3af; font-size:14px;">尚未儲存任何玩家</span>';
+    return;
+  }
+
+  listEl.innerHTML = savedPlayers.map((name, index) => `
+    <span class="tag" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px;" onclick="addSavedPlayer(${index})">
+      ${escapeHtml(name)}
+      <button type="button" title="刪除此已儲存玩家"
+              onclick="event.stopPropagation(); deleteSavedPlayer(${index})"
+              style="width:auto; min-width:18px; height:18px; padding:0; margin:0; font-size:12px; line-height:18px; color:#7c3aed; background:transparent; box-shadow:none; border:none;">
+        ✕
+      </button>
+    </span>
+  `).join('');
+}
+
+function addSavedPlayer(index) {
+  const name = savedPlayers[index];
+  if (!name) return;
+  if (players.includes(name)) {
+    alert('這個玩家已經加入本場');
+    return;
+  }
+  players.push(name);
+  renderPlayerList();
+}
+
+function deleteSavedPlayer(index) {
+  const name = savedPlayers[index];
+  if (!name) return;
+
+  if (!confirm(`確定要刪除已儲存玩家「${name}」嗎？\n\n刪除後，呢個名嘅所有「聽過紀錄」都會一併清除。`)) {
+    return;
+  }
+
+  savedPlayers.splice(index, 1);
+  savePlayers();
+
+  const before = heardRecords.length;
+  heardRecords = heardRecords.filter(r => r.playerName !== name);
+  localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
+
+  renderSavedPlayers();
+  const removed = before - heardRecords.length;
+  alert(removed > 0
+    ? `已刪除玩家「${name}」，並清除咗 ${removed} 筆聽過紀錄。`
+    : `已刪除玩家「${name}」。`);
+}
+
+// ========== 問答流程 ==========
+function renderTagFilter() {
+  const el = document.getElementById('tagFilterList');
+  const allTags = getAllTags();
+
+  if (allTags.length === 0) {
+    el.innerHTML = '<span style="color:#9ca3af; font-size:14px;">目前沒有任何 Tag</span>';
+    return;
+  }
+
+  el.innerHTML = allTags.map((tag, index) => {
+    const isSelected = selectedTags.includes(tag);
+    return `
+      <span class="tag"
+            style="cursor:pointer; background:${isSelected ? '#c4b5fd' : '#f3e8ff'}; color:${isSelected ? 'white' : '#7c3aed'};"
+            onclick="toggleTag(${index})">
+        ${escapeHtml(tag)}
+      </span>`;
+  }).join('');
+}
+
+function toggleTag(index) {
+  const allTags = getAllTags();
+  const tag = allTags[index];
+  if (!tag) return;
+
+  if (selectedTags.includes(tag)) {
+    selectedTags = selectedTags.filter(t => t !== tag);
+  } else {
+    selectedTags.push(tag);
+  }
+  renderTagFilter();
+}
+
+function startQuiz() {
+  if (players.length === 0) {
+    alert('請至少加入一位玩家');
+    return;
+  }
+
+  const filtered = selectedTags.length === 0
+    ? questions
+    : questions.filter(q => (q.tags || []).some(tag => selectedTags.includes(tag)));
+
+  if (filtered.length === 0) {
+    alert(selectedTags.length === 0
+      ? '目前沒有任何問題，請先去管理題庫新增！'
+      : '選擇的分類目前沒有題目，請換個分類或新增題目');
+    return;
+  }
+
+  sessionScores = {};
+  players.forEach(p => sessionScores[p] = 0);
+  currentCorrect = [];
+
+  document.getElementById('quiz-setup').style.display = 'none';
+  document.getElementById('quiz-play').style.display = 'block';
+  document.getElementById('quiz-result').style.display = 'none';
+
+  nextQuestion(true);
+}
+
+function nextQuestion(isFirst = false) {
+  if (!isFirst && currentQuestion) {
+    players.forEach(playerName => {
+      const already = heardRecords.some(r =>
+        r.questionId === currentQuestion.id && r.playerName === playerName
+      );
+      if (!already) {
+        heardRecords.push({
+          questionId: currentQuestion.id,
+          playerName,
+          heardAt: Date.now()
+        });
+      }
+    });
+    localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
+
+    currentCorrect.forEach(name => {
+      if (sessionScores[name] !== undefined) sessionScores[name] += 1;
+    });
+  }
+
+  const baseQuestions = selectedTags.length === 0
+    ? questions
+    : questions.filter(q => (q.tags || []).some(tag => selectedTags.includes(tag)));
+
+  const available = baseQuestions.filter(q => {
+    const heardBy = heardRecords
+      .filter(r => r.questionId === q.id)
+      .map(r => r.playerName);
+    return players.every(p => !heardBy.includes(p));
+  });
+
+  if (available.length === 0) {
+    alert('所有玩家都已經聽過目前能出的題目了！');
+    endQuiz();
+    return;
+  }
+
+  const newQuestion = available[Math.floor(Math.random() * available.length)];
+  const card = document.getElementById('questionCard');
+
+  if (isFirst) {
+    currentQuestion = newQuestion;
+    currentCorrect = [];
+    updateQuestionContent();
+    renderCorrectPlayers();
+    return;
+  }
+
+  card.classList.remove('slide-in-start', 'slide-in-end');
+  card.classList.add('slide-out');
+
+  setTimeout(() => {
+    currentQuestion = newQuestion;
+    currentCorrect = [];
+    updateQuestionContent();
+    renderCorrectPlayers();
+
+    card.classList.remove('slide-out');
+    card.classList.add('slide-in-start');
+    void card.offsetWidth;
+    card.classList.remove('slide-in-start');
+    card.classList.add('slide-in-end');
+  }, 350);
+}
+
+function updateQuestionContent() {
+  document.getElementById('currentQuestion').textContent = currentQuestion.question;
+  const answerEl = document.getElementById('currentAnswer');
+  answerEl.style.display = 'block';
+  answerEl.textContent = '答案：' + currentQuestion.answer;
+}
+
+function renderCorrectPlayers() {
+  const el = document.getElementById('correctPlayers');
+  el.innerHTML = players.map(name => {
+    const isChecked = currentCorrect.includes(name);
+    return `
+      <label style="display:inline-flex; align-items:center; gap:6px; background:${isChecked ? '#c4b5fd' : '#f3e8ff'}; color:${isChecked ? 'white' : '#7c3aed'}; padding:8px 12px; border-radius:999px; cursor:pointer; margin:4px;">
+        <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleCorrect('${escapeHtml(name)}', this.checked)">
+        ${escapeHtml(name)}
+      </label>`;
+  }).join('');
+}
+
+function toggleCorrect(playerName, isChecked) {
+  if (isChecked) {
+    if (!currentCorrect.includes(playerName)) currentCorrect.push(playerName);
+  } else {
+    currentCorrect = currentCorrect.filter(n => n !== playerName);
+  }
+  renderCorrectPlayers();
+}
+
+function endQuiz() {
+  if (currentQuestion) {
+    players.forEach(playerName => {
+      const already = heardRecords.some(r =>
+        r.questionId === currentQuestion.id && r.playerName === playerName
+      );
+      if (!already) {
+        heardRecords.push({
+          questionId: currentQuestion.id,
+          playerName,
+          heardAt: Date.now()
+        });
+      }
+    });
+    localStorage.setItem('heardRecords', JSON.stringify(heardRecords));
+
+    currentCorrect.forEach(name => {
+      if (sessionScores[name] !== undefined) sessionScores[name] += 1;
+    });
+  }
+
+  document.getElementById('quiz-play').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'block';
+
+  const board = document.getElementById('scoreBoard');
+  const sorted = Object.entries(sessionScores).sort((a, b) => b[1] - a[1]);
+  board.innerHTML = sorted.map(([name, score], index) => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #f3e8ff;">
+      <span>${index + 1}. ${escapeHtml(name)}</span>
+      <span style="font-weight:700; color:#7c3aed;">${score} 分</span>
+    </div>
+  `).join('');
+}
+
+function backToSetup() {
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('quiz-setup').style.display = 'block';
+  players = [];
+  renderPlayerList();
+  renderSavedPlayers();
+}
+
+// ========== CSV ==========
+function escapeCSV(value) {
+  const text = String(value ?? '');
+  if (text.includes(',') || text.includes('"') || text.includes('\n') || text.includes('\r')) {
+    return `"${text.replace(/"/g, '""')}"`;
+  }
+  return text;
+}
+
+function exportCSV() {
+  if (questions.length === 0) {
+    alert('目前沒有任何題目可以匯出');
+    return;
+  }
+
+  const headers = ['id', 'question', 'answer', 'tags'];
+  const rows = questions.map(q => [
+    q.id,
+    q.question,
+    q.answer,
+    (q.tags || []).join('、')
+  ]);
+
+  const csvContent = [headers, ...rows]
+    .map(row => row.map(escapeCSV).join(','))
+    .join('\r\n');
+
+  const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `題庫_${getDateString()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+  alert('CSV 題庫已匯出！');
+}
+
+function parseCSV(csvText) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < csvText.length; i++) {
+    const char = csvText[i];
+    const next = csvText[i + 1];
+
+    if (char === '"' && insideQuotes && next === '"') {
+      cell += '"';
+      i++;
+    } else if (char === '"') {
+      insideQuotes = !insideQuotes;
+    } else if (char === ',' && !insideQuotes) {
+      row.push(cell);
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+      if (char === '\r' && next === '\n') i++;
+      row.push(cell);
+      cell = '';
+      if (row.some(v => v.trim() !== '')) rows.push(row);
+      row = [];
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell.length > 0 || row.length > 0) {
+    row.push(cell);
+    if (row.some(v => v.trim() !== '')) rows.push(row);
+  }
+
+  return rows;
+}
+
+function processImportedQuestions(importedQuestions) {
+  if (importedQuestions.length === 0) {
+    alert('沒有讀取到有效的題目');
+    return;
+  }
+
+  const shouldImport = confirm(
+    `成功讀取 ${importedQuestions.length} 題。\n\n按「確定」合併到現有題庫。\n按「取消」取消匯入。`
+  );
+  if (!shouldImport) return;
+
+  const existingIds = new Set(questions.map(q => q.id));
+  const newQuestions = importedQuestions.filter(q => !existingIds.has(q.id));
+  questions = questions.concat(newQuestions);
+  saveQuestions();
+
+  alert(`成功合併 ${newQuestions.length} 題！`);
+
+  if (document.getElementById('manage')?.classList.contains('active')) {
+    renderQuestionList();
+    renderWriteTagFilter();
+  }
+  renderExistingTagSuggestions();
+  if (typeof renderTagFilter === 'function') renderTagFilter();
+}
+
+function importCSV(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      let csvText = e.target.result.replace(/^\uFEFF/, '');
+      const rows = parseCSV(csvText);
+
+      if (rows.length < 2) {
+        alert('CSV 檔案沒有有效題目資料');
+        return;
+      }
+
+      const headers = rows[0].map(h => h.trim().toLowerCase());
+      const qIdx = headers.indexOf('question');
+      const aIdx = headers.indexOf('answer');
+      const tIdx = headers.indexOf('tags');
+      const idIdx = headers.indexOf('id');
+
+      if (qIdx === -1 || aIdx === -1) {
+        alert('CSV 格式錯誤：必須包含 question 和 answer 欄位');
+        return;
+      }
+
+      const imported = rows.slice(1).map(row => {
+        const question = (row[qIdx] || '').trim();
+        const answer = (row[aIdx] || '').trim();
+        if (!question || !answer) return null;
+
+        const tagsText = (row[tIdx] || '').trim();
+        const tags = tagsText
+          ? tagsText.split(/[、,，]/).map(t => t.trim()).filter(Boolean)
+          : [];
+
+        return {
+          id: idIdx !== -1 && row[idIdx] ? Number(row[idIdx]) : Date.now() + Math.random(),
+          question,
+          answer,
+          tags: [...new Set(tags)]
+        };
+      }).filter(Boolean);
+
+      processImportedQuestions(imported);
+    } catch (err) {
+      console.error(err);
+      alert('CSV 讀取失敗，請確認檔案格式正確');
+    }
+  };
+
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = '';
+}
+
+function openPasteCSV() {
+  document.getElementById('pasteCSVInput').value = '';
+  document.getElementById('pasteCSVModal').style.display = 'flex';
+}
+
+function closePasteCSV() {
+  document.getElementById('pasteCSVModal').style.display = 'none';
+}
+
+function importPastedCSV() {
+  let csvText = document.getElementById('pasteCSVInput').value.trim();
+  if (!csvText) {
+    alert('請先貼上 CSV 內容');
+    return;
+  }
+
+  csvText = csvText.replace(/^\uFEFF/, '');
+
+  try {
+    const rows = parseCSV(csvText);
+    if (rows.length < 2) {
+      alert('CSV 內容沒有有效題目資料');
+      return;
+    }
+
+    const headers = rows[0].map(h => h.trim().toLowerCase());
+    const qIdx = headers.indexOf('question');
+    const aIdx = headers.indexOf('answer');
+    const tIdx = headers.indexOf('tags');
+    const idIdx = headers.indexOf('id');
+
+    if (qIdx === -1 || aIdx === -1) {
+      alert('CSV 格式錯誤：必須包含 question 和 answer 欄位');
+      return;
+    }
+
+    const imported = rows.slice(1).map(row => {
+      const question = (row[qIdx] || '').trim();
+      const answer = (row[aIdx] || '').trim();
+      if (!question || !answer) return null;
+
+      const tagsText = (row[tIdx] || '').trim();
+      const tags = tagsText
+        ? tagsText.split(/[、,，]/).map(t => t.trim()).filter(Boolean)
+        : [];
+
+      return {
+        id: idIdx !== -1 && row[idIdx] ? Number(row[idIdx]) : Date.now() + Math.random(),
+        question,
+        answer,
+        tags: [...new Set(tags)]
+      };
+    }).filter(Boolean);
+
+    processImportedQuestions(imported);
+    closePasteCSV();
+  } catch (err) {
+    console.error(err);
+    alert('CSV 解析失敗，請確認格式正確');
+  }
+}
 </script>
 </body>
 </html>
