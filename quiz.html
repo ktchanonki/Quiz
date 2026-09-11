@@ -693,6 +693,9 @@ body::after {
   🏷️ 管理 Tag
 </button>
 
+<div id="questionCountBar" style="margin-top:24px; margin-bottom:10px; font-size:14px; color:#7c6b9b; font-weight:600;"></div>
+<div id="questionList"></div>
+
   <!-- 問題列表 -->
   <div id="questionList" style="margin-top: 24px;"></div>
 </div>
@@ -982,6 +985,14 @@ if (document.activeElement) {
 }
 function renderQuestionList() {
   const listEl = document.getElementById('questionList');
+  const countBar = document.getElementById('questionCountBar');
+
+  // 更新總數顯示
+  if (countBar) {
+    countBar.textContent = questions.length > 0 
+      ? `目前共有 ${questions.length} 題` 
+      : '';
+  }
 
   if (questions.length === 0) {
     listEl.innerHTML =
